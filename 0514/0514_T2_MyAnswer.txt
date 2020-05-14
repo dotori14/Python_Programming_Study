@@ -1,0 +1,42 @@
+from urllib.request import urlopen 
+from bs4 import BeautifulSoup 
+import re
+
+temp_list = []
+
+num = 0
+
+html = urlopen('http://en.wikipedia.org/wiki/Kevin_Bacon')
+bs = BeautifulSoup(html, 'html.parser')
+
+# 데이터 파싱
+data = bs.find('div', {'id':'bodyContent'}).find_all('a', {'href' : re.compile('^(/wiki/).*(\.jpg)$')})
+  
+for data_re in data:
+
+       # 이미지 href
+       if 'href' in data_re.attrs:
+           num += 1
+           print("=====================================")
+           print("1. Picture Herf,", num)
+           data_1  = data_re.attrs['href'] 
+           
+       #if num == 1 or num == 3 or num == 5:
+           
+           for data_re2 in data_re.next_siblings:
+                print("--------------------------------------")
+                      
+                try:
+                   print("2. Description")   
+                   data_2 = data_re2.get_text()
+                except AttributeError as ex:
+                   print("# AttributeError,", ex)
+                else:
+                   temp = str(num) + str(".\nhref : ") + data_1 + str("\ndescription : ") + data_2
+                   temp_list.append(temp)             
+                
+for temp_d in temp_list:
+    print("============== LIST =================")
+    print(temp_d)
+    print("=====================================")
+

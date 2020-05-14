@@ -1,0 +1,23 @@
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+import re
+
+html = urlopen('http://www.pythonscraping.com/pages/page3.html')
+bs = BeautifulSoup(html, 'html.parser')
+images = bs.find_all('img', {'src':re.compile('\.\.\/img\/gifts/img.*\.jpg')})
+for image in images: 
+    print(image['src'])
+
+# 정규식 (. / */ )
+# a.b = a, b 사이에 딴거 하나까지 수용
+# a* = a, aaa..., 공백까지 수용 (패턴 0개 이상 반복)
+# a.* = .을 *(0번 이상가능)
+# [a-Z]* = 전체 아무거나 []사이 들중 하나
+
+# \. = 문자열 .
+# /는 \ 안써도 됨
+
+# https://regex101.com/
+-> 파이썬 정규식 테스트
+# https://repl.it/@whengus/NovelBlondList
+-> 파이썬 소스코드 참조

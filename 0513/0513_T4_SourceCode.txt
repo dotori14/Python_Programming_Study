@@ -1,0 +1,10 @@
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+import re
+
+html = urlopen('http://www.pythonscraping.com/pages/page3.html')
+bs = BeautifulSoup(html, 'html.parser')
+test = bs.find_all('tr', {'id': re.compile('gift.') , 'class': re.compile('gift') } )
+for test_r1 in test:
+    print('---------------------')
+    print(test_r1)

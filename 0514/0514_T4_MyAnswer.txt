@@ -1,0 +1,22 @@
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+import datetime
+import random
+import re
+
+def num_out(counter, num1, num2, num3):
+    print("=========================")
+    print("{count}. num1 : {one} \n    num2 : {two} \n    num3 : {three}".format(count = counter, one = num1, two = num2, three = num3))
+    print("=========================")
+
+counter = 0
+random.seed(datetime.datetime.now())
+
+while counter < 100:
+    
+    counter += 1
+    Num1 = random.randint(0, 100)
+    Num2 = random.randint(0, 100)
+    Num3 = random.randint(0, 100)
+    
+    num_out(counter, Num1, Num2, Num3)

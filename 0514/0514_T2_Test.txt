@@ -1,0 +1,21 @@
+from urllib.request import urlopen 
+from bs4 import BeautifulSoup 
+import re
+
+html = urlopen('http://en.wikipedia.org/wiki/Kevin_Bacon')
+bs = BeautifulSoup(html, 'html.parser')
+
+
+1.  BodyContent 안에 있는 a 태그를 가져오세요.  A태그의 href 속성의 이름들은 /wiki/ 로 시작하고 , .jpg 로 끝나는 속성들만 가져오세요. 
+  
+힌트 – find, findAll , 정규식 사용.
+
+
+2.  가져온 확장자 jpg 의 내용 설명(description) 을 get_text() 매소드를 이용해서 가져오세요.
+  
+힌트 - .jpg의 설명은 .jpg 의 바로 아래의 div 태그안에 있어요 , next_siblings 를 사용하세요
+
+
+3.  발생한 문제에 대해서 예외처리를 수행하여 프로그램이 정상적으로 돌도록 해주세요. 
+  
+힌트  - AttributeError 에러 

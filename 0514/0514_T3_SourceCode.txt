@@ -1,0 +1,40 @@
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+import datetime
+import random
+import re
+
+# random.random 으로 seed 값 세팅가능
+#random.seed(random.random())
+
+# 현재 날짜로 seed 값 세팅가능
+print(datetime.datetime.now())
+random.seed(datetime.datetime.now())
+
+# -100 ~ 100 사이 숫자 랜덤
+print(random.randint(-100, 100))
+
+print(random.random())
+print(random.random())
+print(random.random())
+print(random.random())
+
+#####################
+
+# print 인자 선언
+
+def test(num, data):
+    print("num : {}, data : {}".format(num, data))
+    print("num : {one}, data : {two}".format(two = num, one = data))
+    
+test(1,2)
+
+####################
+
+# while문 예시
+
+counter = 10
+
+while counter > 0:
+    counter -= 1
+    print (counter)

@@ -1,0 +1,40 @@
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+from urllib.error import HTTPError
+from urllib.error import URLError
+
+def PrintType_1():    
+    print ("================================================================")
+def PrintType_2():    
+    print ("----------------------------------------------------------------")
+    # for문 방법 배우기
+    
+try : 
+    Html = urlopen('http://www.pythonscraping.com/pages/warandpeace.html')
+    FieldData = BeautifulSoup(Html, 'html.parser')
+    
+except HTTPError as ex : 
+    print("# Problem, no page found:", ex)
+    PrintType_1()
+
+except URLError as ex :
+    print("# Problem, no sever found:", ex)
+    PrintType_1()
+
+else :     
+    print("# No Problem, normal")
+    PrintType_1()
+
+    Findlist = FieldData.findAll("span", {"class" : "red"})
+          
+    for Element in Findlist :
+        print(Element.get_text())
+        PrintType_2()
+        
+finally : 
+    PrintType_1()
+    print("# No Problem, final")
+      
+      
+
+      

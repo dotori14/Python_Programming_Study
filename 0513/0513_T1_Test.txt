@@ -1,0 +1,31 @@
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+from urllib.error import HTTPError
+from urllib.error import URLError
+
+'http://www.pythonscraping.com/pages/warandpeace.html'
+
+1.예외 처리 코드를 추가 해주세요.   
+- 정확하지 않은 페이지 정보를 요청했을때 ‘no page found’ 메시지와 함께 ‘어떤 예외 상황인지’를 같이 출력해주세요.  
+- 정확하지 않은 서버(도메인)으로 접근했을때에는 ‘no sever found’ 메시지를 출력해주고 ‘어떤 예외 상황인지’ 를 같이 출력해주세요  
+- 정상 적인 상황인 경우 ‘normal’ 메시지 출력해주세요.  
+- 그리고 마지막으로 ‘final’ 이라는 메시지를 무조건 출력되게 해주세요
+
+힌트
+try :    
+  객체이름 = urlopen(‘url주소’)
+Except ‘HTTPError 또는 URLError’ as ‘에러메세지 변수’ : 
+    메시지 + 어떤 예외 상황인지 출력
+else :      
+  ‘normal’      
+  findAll      
+  for문
+Finally : 
+      ‘final’
+
+2. findAll 함수를 이용해서 웹페이지의 빨간색 글씨의 태그를 모두다 가져오세요. 
+    힌트 – findAll(‘태그이름’ , {‘속성’: ‘속성 값’ } )  
+
+
+3. 가져온 변수를 for문을 이용해서 해당 element 에 모두 한번씩 접근하여서 ‘텍스트’만 출력되게 해주세요 
+힌트  - 태그.get_text()

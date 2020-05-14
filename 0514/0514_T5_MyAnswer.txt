@@ -1,0 +1,33 @@
+# 주소 변경시, 이전에 변경했던 주소는 참조하지 않게 하기
+
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+import datetime
+import random
+import re
+
+link_list = []
+
+random.seed(datetime.datetime.now())
+
+def getLinks(articleUrl):
+    
+    if articleUrl not in link_list:
+        
+        link_list.append(articleUrl)
+        html = urlopen('http://en.wikipedia.org{}'.format(articleUrl))
+        bs = BeautifulSoup(html, 'html.parser')
+        return bs.find('div', {'id':'bodyContent'}).find_all('a', href=re.compile('^(/wiki/)((?!:).)*$'))
+    
+    else :
+        return None
+
+links = getLinks('/wiki/Kevin_Bacon')
+
+while len(links) > 0:
+    newArticle = links[random.randint(0, len(links)-1)].attrs['href']
+    print(newArticle)
+    links = getLinks(newArticle)
+
+    # 서버내부 링크 = 내부링크
+    # 다른서버 링크 = 외부링크

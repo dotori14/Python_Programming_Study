@@ -1,0 +1,24 @@
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+import re
+
+pages = list()
+
+def getLinks(pageUrl):
+    global pages
+    html = urlopen('http://en.wikipedia.org{}'.format(pageUrl))
+    bs = BeautifulSoup(html, 'html.parser')
+    
+    for link in bs.find_all('a', {'href' : re.compile('^(/wiki/)')}):
+        if 'href' in link.attrs:
+            if link.attrs['href'] not in pages:
+                page_data = link.attrs['href']
+                pages.append(page_data)
+                #getLinks(page_data)
+                print("---------------------------")
+                print(pages)
+                getLinks(page_data)
+
+links = getLinks('')
+
+# 인터럽트 걸기, Ctrl + C
