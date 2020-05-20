@@ -1,0 +1,18 @@
+url = 'https://pjt3591oo.github.io'
+import requests as rq
+from bs4 import BeautifulSoup
+import time 
+
+bs4_start = time.time()
+
+res = rq.get(url)
+soup = BeautifulSoup(res.content, 'lxml')
+div_selectors21 = soup.select('div')
+div_selectors22 = soup.select('div')
+div_selectors23 = soup.select('div')
+div_selectors24 = soup.select('div')
+div_selectors25 = soup.select('div')
+
+bs4_end = time.time() - bs4_start
+
+print('usage bs4  : %f' %(bs4_end))

@@ -1,0 +1,21 @@
+from selenium import webdriver
+import time
+
+url = 'https://pjt3591oo.github.io'
+
+selenium_start = time.time()
+
+driver = webdriver.Chrome('C:/TEMP/chromedriver.exe')
+driver.get(url)
+
+div_selectors11 = driver.find_elements_by_css_selector('div')
+div_selectors12 = driver.find_elements_by_css_selector('div')
+div_selectors13 = driver.find_elements_by_css_selector('div')
+div_selectors14 = driver.find_elements_by_css_selector('div')
+div_selectors15 = driver.find_elements_by_css_selector('div')
+
+selenium_end = time.time() - selenium_start
+
+print('usage selenium  : %f' %(selenium_end))
+
+

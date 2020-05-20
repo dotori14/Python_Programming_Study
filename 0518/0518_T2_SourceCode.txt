@@ -1,0 +1,21 @@
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+    
+url = 'https://pjt3591oo.github.io'
+
+driver = webdriver.Chrome('C:/TEMP/chromedriver.exe')
+driver.get(url)
+
+try : 
+    selected_link = driver.find_element_by_link_text('/')
+    print(selected_link)
+    print(selected_link.tag_name)
+    print(selected_link.text)
+
+except NoSuchElementException as ex: 
+    print("NoSuchElementException,", ex)
+    
+'''
+selected_links = driver.find_elements_by_link_text('')  
+print(selected_links)
+'''

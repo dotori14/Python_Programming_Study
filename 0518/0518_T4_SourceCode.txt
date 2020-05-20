@@ -1,0 +1,17 @@
+from selenium import webdriver
+
+url = 'https://pjt3591oo.github.io'
+
+driver = webdriver.Chrome('C:/TEMP/chromedriver.exe')
+driver.get(url)
+
+selected_selectors = driver.find_elements_by_css_selector('div.home h1')
+print(selected_selectors)
+
+selected_selectors = driver.find_elements_by_css_selector('div.home h1.page-heading')
+print(selected_selectors)
+
+selected_selectors = driver.find_elements_by_css_selector('h1.page-heading')
+print(selected_selectors)
+
+

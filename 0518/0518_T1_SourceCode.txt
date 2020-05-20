@@ -1,0 +1,13 @@
+from selenium import webdriver
+
+url = 'https://pjt3591oo.github.io'
+
+driver = webdriver.Chrome('C:/TEMP/chromedriver.exe')
+driver.get(url)
+
+selected_id = driver.find_element_by_id('nav-trigger')
+print(selected_id)
+print("===================")
+print(selected_id.tag_name)
+print("===================")
+print(selected_id.text)

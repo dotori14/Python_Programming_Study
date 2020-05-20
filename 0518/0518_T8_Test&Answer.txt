@@ -1,0 +1,32 @@
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+import requests as rq
+import re
+
+
+url = 'https://pjt3591oo.github.io/search'
+
+driver = webdriver.Chrome('C:/TEMP/chromedriver.exe')
+driver.get(url)
+
+# 1. 셀레니움을 이용해서 'python' 이라고 검색. 
+
+selected_tag_a = driver.find_element_by_css_selector('input#search-box')
+
+selected_tag_a.send_keys('python')
+selected_tag_a.send_keys(Keys.ENTER)
+
+# 2. beautifulSoup을 이용하여서 해당 결과 리스트들의 제목들만 출력해주세요.
+
+bs = BeautifulSoup(driver.page_source, 'html.parser')
+
+result_list = bs.find('ul', {'id':'search-results'}).find_all('h3')
+for result in result_list:
+    print(result.text)
+
+
+
+

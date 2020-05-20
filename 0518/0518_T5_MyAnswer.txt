@@ -1,0 +1,11 @@
+from selenium import webdriver
+
+url = 'https://pjt3591oo.github.io'
+
+driver = webdriver.Chrome('C:/TEMP/chromedriver.exe')
+driver.get(url)
+
+selected_selector = driver.find_element_by_css_selector('div.wrapper div.trigger a')
+print(selected_selector.tag_name)
+print(selected_selector.text)
+selected_selector.click()
