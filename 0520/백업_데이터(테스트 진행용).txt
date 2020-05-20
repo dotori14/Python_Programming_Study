@@ -1,0 +1,397 @@
+﻿import requests
+from bs4 import BeautifulSoup
+# 인기 검색어 추출용 
+from urllib.parse import urlparse, parse_qs, urljoin
+import json
+# 네이버 웹툰 추천용, 셀레니움 활용
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from time import sleep
+import time
+
+Menu_list = ['[1] 급상승 키워드','[2] 인기 웹툰','[3] 현재 날씨','[4] TOP 상품','[5] 키워드 검색','[6] 나가기']
+Keyword_list = []
+Shopping_list = []
+Blnak = ''
+Division = Blnak.center(50, '=')
+Division2 = Blnak.center(50, '-')
+Division3 = Blnak.center(50, '#')
+
+# 메뉴
+def Init():
+    
+    print()
+    print(Division3)
+    for menu in Menu_list:
+        print(menu)
+    print(Division3)
+    num = input('원하는 기능을 선택하세요.\n')
+    print()
+    return num
+
+# 키워드 조회 처리 과정
+# 1. 조회 여부 판단 (조회시, 범위 값 리턴)
+def If_you_can(command):
+    
+    right = ""
+    
+    # 조회 여부 입력 
+    while True:
+        read_keyword = input("해당 키워드에 대해 조회하시겠습니까? (y/n)\n") 
+        
+        if read_keyword == 'y' or read_keyword == 'Y' or read_keyword == 'yes' or read_keyword == 'YES' :
+            # 조회시, 조회 범위 입력
+            right = Value_Init(command)            
+            break
+        
+        elif read_keyword == 'n' or read_keyword == 'N' or read_keyword == 'no' or read_keyword == 'NO' :
+            right = 'Pass'
+            break
+        
+    return right     
+
+# 2. 범위 값 리턴
+def Value_Init(command):
+    
+    print()
+    print(Division3)
+    print("[전체] 0")
+    print("[범위] 숫자~숫자 (1~3...)")
+    print("[단일] 숫자 (1...)")
+    print(Division3)
+    
+    return Define_Num_Corrct(command)
+        
+# 3. 범위 체크 검출기
+def Define_Num_Corrct(command):
+      
+     while True:
+         
+        right = True 
+        num = str(input('원하는 범위를 선택하세요.\n'))
+        print()
+        num_list = num.split('~')
+       
+        try:
+            if int(num_list[0]) == 0 and len(num_list) == 1:
+                break
+            
+            else:
+                for data in num_list:
+                    
+                   count = int(data)                
+                   if int(command) == 1:
+                       if count < 1 or count > 20 :
+                            right = False
+                            
+                   elif int(command) == 4:
+                       if count < 1 or count > 10 :
+                            right = False
+                if right:
+                   break
+        except ValueError as ex:  
+            print('ValueError, 정확한 값을 다시 넣어주세요!')
+            
+     return num
+                 
+# 선택 목록 출력
+def Show_Current_Menu(num):
+    
+    print()
+    print(Division)    
+    count = str(num)
+    for index, menu in enumerate(Menu_list):
+        if index == (num-1) :
+         print(" " + menu)     
+    print(Division)
+    print()
+   
+# [1] 키워드 리스트 추출 
+def Get_KeyWord():
+    
+    KeyWord_JSon = 'https://www.naver.com/srchrank?frm=main'
+
+    # 아래 주소가 메인페이지 내부에서 호출되는 실시간 검색어 데이터를 넘겨주는 주소
+    # requests.get("주소").json() 을 하면 데이터를 json 형태로 받아올 수 있습니다.
+    # 아래 주소를 직접 브라우저에서 접속해보시기 바랍니다.
+    json = requests.get(KeyWord_JSon).json()
+    # http://rank.search.naver.com/rank.js
+    # json 데이터에서 "data" 항목의 값을 추출
+    ranks = json.get("data")
+    
+    # 해당 값은 리스트 형태로 제공되기에 리스트만큼 반복
+    for r in ranks:
+        # 각 데이터는 rank, keyword, keyword_synomyms
+        rank = r.get("rank")
+        keyword = r.get("keyword")
+        print(" {}. {}".format(str(rank), keyword))
+        Keyword_list.append(keyword)
+        
+    print(Division2)
+ 
+# [1] 키워드 기사 제목, 해당 목차 추출               
+def Show_KeyWord_Part(num):
+
+    for index, keyword in enumerate(Keyword_list): 
+        if index == num :
+            print(Division)
+            print(" {}. {}".format(str(num+1),keyword))
+            print(Division)
+            
+            # 해당 키워드 페이지로 진입
+            url = f'https://search.naver.com/search.naver?where=news&sm=tab_jum&query={keyword}'
+            html = requests.get(url)
+            bs = BeautifulSoup(html.text, 'html.parser')
+            
+            # 기사 제목 추출
+            news_list = bs.select('.news .type01 li dt a[title]')
+            print(" 총 {}개의 뉴스가 있습니다.".format(len(news_list)))
+ 
+            for title in news_list:
+                print(Division2)
+                print("  " + title['title'])
+
+# [3] 날씨 출력              
+def Show_Weather():
+    
+    # 종합 날씨 페이지로 진입
+    html = requests.get('https://search.naver.com/search.naver?query=날씨')
+    #pprint(html.text)   
+    soup = BeautifulSoup(html.text, 'html.parser') 
+    data1 = soup.find('div', {'class': 'weather_box'})
+  
+    # 현재 날씨 추출
+    today_address = data1.find('span', {'class':'btn_select'}).text
+    today_currenttemp = data1.find('span',{'class': 'todaytemp'}).text
+    
+    data2 = data1.findAll('dd')
+    today_dust = data2[0].find('span', {'class':'num'}).text
+    today_ultra_dust = data2[1].find('span', {'class':'num'}).text
+    today_ozone = data2[2].find('span', {'class':'num'}).text
+    
+    print(Division)
+    print(" 현재 날씨 정보 ({})".format(today_address)) 
+    print(Division)
+      
+    print("  현재 온도: "       + today_currenttemp+'℃')
+    print("  현재 미세먼지: "   + today_dust)
+    print("  현재 초미세먼지: " + today_ultra_dust)
+    print("  현재 오존지수: "   + today_ozone)
+    
+    # 내일 날씨 추출
+    # 내일 오전, 오후 온도 및 상태 체크 
+    tomorrowArea  = soup.find('div', {'class': 'tomorrow_area'}) 
+    tomorrowCheck = tomorrowArea.find_all('div', {'class': 'main_info morning_box'}) 
+    # 내일 오전온도
+    tomorrowMoring1 = tomorrowCheck[0].find('span', {'class': 'todaytemp'}).text 
+    tomorrowMoring2 = tomorrowCheck[0].find('span', {'class' : 'tempmark'}).text[2:] 
+    tomorrowMoring  = tomorrowMoring1 + tomorrowMoring2 
+    # 내일 오전상태 
+    tomorrowMState1 = tomorrowCheck[0].find('div', {'class' : 'info_data'}) 
+    tomorrowMState2 = tomorrowMState1.find('ul', {'class' : 'info_list'}) 
+    tomorrowMState3 = tomorrowMState2.find('p', {'class' : 'cast_txt'}).text 
+    tomorrowMState4 = tomorrowMState2.find('div', {'class' : 'detail_box'}) 
+    tomorrowMState5 = tomorrowMState4.find('span').text.strip() 
+    tomorrowMState  = tomorrowMState3 + ", " + tomorrowMState5 
+    # 내일 오후온도 
+    tomorrowAfter1 = tomorrowCheck[1].find('p', {'class' : 'info_temperature'})
+    tomorrowAfter2 = tomorrowAfter1.find('span', {'class' : 'todaytemp'}).text 
+    tomorrowAfter3 = tomorrowAfter1.find('span', {'class' : 'tempmark'}).text[2:] 
+    tomorrowAfter  = tomorrowAfter2 + tomorrowAfter3 
+    # 내일 오후상태
+    tomorrowAState1 = tomorrowCheck[1].find('div', {'class' : 'info_data'}) 
+    tomorrowAState2 = tomorrowAState1.find('ul', {'class' : 'info_list'})
+    tomorrowAState3 = tomorrowAState2.find('p', {'class' : 'cast_txt'}).text 
+    tomorrowAState4 = tomorrowAState2.find('div', {'class' : 'detail_box'}) 
+    tomorrowAState5 = tomorrowAState4.find('span').text.strip() 
+    tomorrowAState  = tomorrowAState3 + ", " + tomorrowAState5
+
+    print(Division)
+    print(" 내일 날씨 정보 ({})".format(today_address)) 
+    print(Division)
+    print("  내일 오전 온도: " + tomorrowMoring) 
+    print("  내일 오전 상태: " + tomorrowMState)
+    print("  내일 오후 온도: " + tomorrowAfter) 
+    print("  내일 오후 상태: " + tomorrowAState)
+
+# [4]쇼핑 리스트 출력
+def Show_Shopping():
+    
+    # 쇼핑 메인 페이지 진입
+    url = 'https://search.shopping.naver.com/best100v2/main.nhn'    
+    html = requests.get(url)
+    soup = BeautifulSoup(html.text, 'html.parser') 
+    data = soup.select('#popular_srch_lt > li > span > a')
+    
+    # 인기 목록 추출
+    data_list = soup.find('ul', {'id':'popular_srch_lst'}).find_all('a')
+
+    count = 0
+        
+    # 인기 상품 리스트 출력
+    for data in data_list:
+        count += 1
+        print(" {}. {}".format(str(count), data.text))
+    
+    print(Division2)   
+    print()
+    
+    return data_list
+
+# [4] 관련 상품, 해당 목차 추출
+def Show_Shopping_Data_Part(data_list, num):
+       
+    result_list = []
+     
+    for index, keyword in enumerate(data_list): 
+        if index == num :
+            
+            data = keyword.text
+            
+            print(Division)         
+            print(" {}. {}".format(str(index+1), data))       
+            print(Division)
+            url = f'https://search.shopping.naver.com/search/all.nhn?query={data}&cat_id=&frm=NVSHAKW'
+            html = requests.get(url)
+            soup = BeautifulSoup(html.text, 'html.parser') 
+            data2_list = soup.find_all('div', {'class':'info'})
+    
+            for data2 in data2_list:           
+                   name  = data2.find('a').text
+                   price = data2.find('em').text
+                   data = "제품 : " + name + "\n가격 : " + price.strip()
+                   result_list.append(data)
+                   
+            for result in result_list:
+                print(result)    
+                print(Division2)
+
+# [5] 해당 키워드, 블로그 검색
+def KeyWord_Blog_Search(keyword):
+    
+    url = f'https://search.naver.com/search.naver?where=post&sm=tab_jum&query={keyword}'
+    
+    html = requests.get(url)
+    bs = BeautifulSoup(html.text, 'html.parser')          
+    blog_list = bs.find('ul', {'id':'elThumbnailResultArea'}).find_all('a', {'class':'sh_blog_title _sp_each_url _sp_each_title'})
+    
+    print()
+    print(Division)
+    print(" {}에 대한 총 {}개의 블로그 글이 있습니다.".format(keyword,len(blog_list)))
+    print(Division)
+    
+    for index, blog in enumerate(blog_list):
+        print("  {}. {}".format(str(index+1), blog.text))
+        print(Division2)
+    
+    print(Division)
+        
+while True:  
+
+    # 메뉴 소개    
+    Num = int(Init())
+     
+    # 키워드 조회    
+    if Num == 1:
+                    
+        Show_Current_Menu(Num)
+        # 급상승 키워드 리스트 출력
+        Get_KeyWord() 
+        
+        # 조회 범위값 입력        
+        keyword_command = If_you_can(Num)
+        
+        # 조회시, 조회 범위를 List로 재정의
+        if keyword_command != 'Pass':        
+            command_list = keyword_command.split('~')
+          
+            # 전체 추출
+            if command_list[0] == '0' : 
+                for command in range(0, 20):
+                        Show_KeyWord_Part(command)  
+            # 범위 추출
+            else : 
+                if len(command_list) > 1:
+                    for num in range(int(command_list[0])-1, int(command_list[1])):
+                        Show_KeyWord_Part(num)  
+                else:
+                     Show_KeyWord_Part(int(command_list[0])-1) 
+                     
+    # 웹툰 조회    
+    elif Num == 2:  
+        
+        Show_Current_Menu(Num)   
+        
+        url = 'https://comic.naver.com/webtoon/weekday.nhn'
+        html = requests.get(url).text
+        soup = BeautifulSoup(html,'html.parser')              
+        title = soup.find_all('a',{'class': 'title'})
+        title_list = [] ; title_num = []
+
+        #일주일 2회 이상 연재 작품은 한 번만 데이터 수집
+        for x in range(len(title)):
+            t = title[x].text
+            if(t in title_list):
+                continue
+            else:
+                title_list.append(t)
+                title_num.append(x)    
+                
+        print(" 총 {}개의 작품이 있습니다.".format(len(title_list)))       
+         
+
+    # 날씨 조회    
+    elif Num == 3: 
+        
+        Show_Current_Menu(Num)   
+        
+        # 현재/내일 날씨 정보 출력
+        Show_Weather()  
+        
+    # 쇼핑 조회
+    elif Num == 4:
+        
+        Show_Current_Menu(Num)
+        
+        # 인기 상품 리스트 추출
+        Shopping_list = Show_Shopping()
+        
+        # 조회 범위 입력
+        shopping_command = If_you_can(int(Num))
+        
+        # 조회시, 조회범위를 리스트로 재정의
+        if shopping_command != 'Pass':        
+            command_list = shopping_command.split('~')
+            
+            # 전체 추출
+            if command_list[0] == '0' : 
+                for command in range(0, 10):
+                        Show_Shopping_Data_Part(Shopping_list, command) 
+            # 범위 추출
+            else : 
+                if len(command_list) > 1:
+                    for command in range(int(command_list[0])-1, int(command_list[1])):
+                        Show_Shopping_Data_Part(Shopping_list, command) 
+                else:
+                     Show_Shopping_Data_Part(Shopping_list, int(command_list[0])-1) 
+              
+    # 블로그 검색
+    elif Num == 5:
+        
+        data = input('원하는 키워드를 입력해주세요.\n')    
+        
+        # 키워드에 대한 블로그 검색
+        KeyWord_Blog_Search(data)
+        
+    # 나가기
+    elif Num == 6:
+        break
+
+
+########################################
+# 기능
+# 1. 인기 키워드 (기사 제목) 조회
+# 2. 인기 웹툰 조회 및 실행
+# 3. 현재/내일 날씨 조회
+# 4. 인기 상품 및 가격 조회   
+# 5. 특정 키워드 (블로그 제목) 조회
