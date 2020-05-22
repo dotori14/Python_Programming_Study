@@ -1,0 +1,47 @@
+from selenium import webdriver
+from urllib.request import urlopen
+from selenium.webdriver.common.keys import Keys
+from bs4 import BeautifulSoup
+
+import requests as rq
+import re
+
+# 1. 네이버 들어감
+
+url = 'https://naver.com'
+
+driver = webdriver.Chrome('C:/TEMP/chromedriver.exe')
+driver.get(url)
+
+# 2. python web scraping 로 검색 (0)
+
+selected_tag_a = driver.find_element_by_css_selector('input#query.input_text')
+
+selected_tag_a.send_keys('python web scraping')
+selected_tag_a.send_keys(Keys.ENTER)
+
+# 3. 쇼핑 페이지로 진입 (0)
+
+selected_tag_b = driver.find_element_by_css_selector('p.title_desc.title_desc_v2 > a')
+selected_tag_b.send_keys(Keys.ENTER)
+
+
+html = driver.page_source
+bs = BeautifulSoup(html, 'html.parser')
+
+# 4. 해당 물건의 제목 및 가격을 하나의 원소로
+# 5. 리스트로 만들고 출력
+
+result_list = bs.find('ul', {'class':'goods_list'})
+print(result_list)
+#for result in result_list:
+#    print(result)
+
+
+########################################
+#    1. 네이버에 들어가서, 특정 키워드 검색
+#    2. 
+#    3. 
+#    4. 
+#    5. 
+

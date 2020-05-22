@@ -1,0 +1,65 @@
+from selenium import webdriver
+from urllib.request import urlopen
+from selenium.webdriver.common.keys import Keys
+from bs4 import BeautifulSoup
+from msvcrt import getch
+import requests as rq
+import re
+
+count = 0
+data_list = []
+keyword_list = ['Python Web Scraping','python web scraping cookbook','머신러닝 가이드']
+
+def init():
+    del data_list[:]
+
+url = 'https://naver.com'
+
+driver = webdriver.Chrome('C:/TEMP/chromedriver.exe')
+
+for keyword in keyword_list:
+    
+    init()
+    count += 1
+    print(count) 
+    print("===================================") 
+    # 네이버 들어감
+    driver.get(url)
+    
+    # 2. python web scraping 로 검색    
+    selected_tag_a = driver.find_element_by_css_selector('input#query.input_text')
+    
+    selected_tag_a.send_keys(keyword)
+    selected_tag_a.send_keys(Keys.ENTER)
+    
+    # 3. 쇼핑 페이지로 진입    
+    selected_tag_b = driver.find_element_by_css_selector('p.title_desc.title_desc_v2 > a')
+    selected_tag_b.send_keys(Keys.ENTER)
+    
+    driver.close()
+    driver.switch_to.window(driver.window_handles[0])
+    
+    html = driver.page_source
+    bs = BeautifulSoup(html, 'html.parser')
+    
+    # 4. 해당 정보 태그 수집   
+    result_list = bs.find_all('div', {'class':'info'})
+
+    for result in result_list:           
+           name  = result.find('a').text
+           price = result.find('em').text
+           data = "제목 : " + name + "\n가격 : " + price
+           data_list.append(data)
+    
+    for data in data_list:
+        print(data)    
+        print("-----------------------------------")
+           
+    print("===================================") 
+########################################
+#    1. 네이버에 들어가서, 특정 키워드 검색
+#    2. python web scraping 로 검색
+#    3. 쇼핑 페이지로 진입
+#    4. 해당 물건의 제목 및 가격을 하나의 원소로
+#    5. 리스트로 만들고 출력
+#    6. 키워드 리스트를 검색하여, 해당 관련 데이터를 출력을 반복

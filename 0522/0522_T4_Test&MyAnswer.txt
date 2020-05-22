@@ -1,0 +1,22 @@
+
+import numpy as np
+
+list1 = ['John', 'Mike', 'Sarah', 'Kate', 'Samuel']
+list2 = [78, 95, 84, 98, 88]
+
+
+# 1. 시험점수를 오름차순으로 sort
+# 2. 시험성적에 해당하는 사람의 이름이 매칭되게 sort
+
+#힌트. argsort
+
+sort_list = np.argsort(list2)
+print(sort_list)
+
+# 점수 크기순 순서 리스트
+for data in sort_list:
+    # 이름 인덱스/정보 리스트 
+    for index, data2 in enumerate(list1) :
+        # 점수 크기 순서대로 출력
+        if index == data:
+            print("{}의 점수는 {}점입니다.".format(data2, list2[index]))

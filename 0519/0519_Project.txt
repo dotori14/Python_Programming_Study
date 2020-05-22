@@ -1,0 +1,54 @@
+import requests
+from bs4 import BeautifulSoup
+
+Keyword_list = []
+News_list = []
+count = 0
+
+# 아래 주소가 메인페이지 내부에서 호출되는 실시간 검색어 데이터를 넘겨주는 주소
+# requests.get("주소").json() 을 하면 데이터를 json 형태로 받아올 수 있습니다.
+# 아래 주소를 직접 브라우저에서 접속해보시기 바랍니다.
+json = requests.get('https://www.naver.com/srchrank?frm=main').json()
+
+# json 데이터에서 "data" 항목의 값을 추출
+ranks = json.get("data")
+
+# 해당 값은 리스트 형태로 제공되기에 리스트만큼 반복
+for r in ranks:
+    # 각 데이터는 rank, keyword, keyword_synomyms
+    #rank = r.get("rank")
+    keyword = r.get("keyword")
+    #print(rank, keyword)
+    Keyword_list.append(keyword)
+
+# 인기 검색어 네이버 검색
+print("===================================")
+print('인기 검색어')
+print("===================================")
+    
+for keyword in Keyword_list: 
+    
+    print()
+    count += 1    
+    print("===================================")
+    print(str(count) + ". " + keyword)
+    print("===================================")
+    url = f'https://search.naver.com/search.naver?where=news&sm=tab_jum&query={keyword}'
+    html = requests.get(url)
+    bs = BeautifulSoup(html.text, 'html.parser')
+    
+    news_list = bs.select('.news .type01 li dt a[title]')
+    print('총', len(news_list), '개의 뉴스 제목이 있습니다')
+    for title in news_list:
+        print('---------------------------------')
+        print(" " + title['title'])
+  
+        
+        
+########################################
+#    1. 네이버에 들어가서, 인기검색어 추출
+#    2. 인기검색어로 검색
+#    3. 해당 키워드 뉴스 제목 / 블로그 제목 및 내용 저장 / 시간대 저장
+#    4. 
+#    5. 
+#    6. 

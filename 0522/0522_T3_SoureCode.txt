@@ -1,0 +1,25 @@
+0522 02:00~ [예제]
+
+==========
+최종 정리
+==========
+
+import numpy as np
+
+test_type1 = np.array([3,1,9,5])
+test_type2 = np.array([[3,1],[9,5]])
+print(test_type1)
+
+# 예제1 :  거꾸로 정렬
+test1 = np.sort(test_type1)[::-1]
+print(test1)
+print('---------------------')
+
+# 예제2 : 행/열별로 정렬
+test2 = np.sort(test_type2, axis=1)
+print(test2)
+print('---------------------')
+
+# 예제3 : 높이 순서대로 정렬
+sort_result = np.argsort(test_type1)
+print(sort_result)

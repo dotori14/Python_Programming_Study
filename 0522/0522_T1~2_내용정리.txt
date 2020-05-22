@@ -1,0 +1,11 @@
+1. A = np.array([...]) : 배열 저장
+2. A.shape : 배열 구성 값
+3. A = np.ones((3,2)) : 3,2 배열 저장 (zeros) 
+4. A = np.arange(10) : 0부터 10개 순서대로 저장
+5. A.reshape(2,-1) : 행,열 + '-1'은 조건 없음
+6. A[:10] : 0부터 10개까지
+7. A = np.sort(A)[::-1] : 꺼꾸로 정렬
+8. A = np.sort(test, axis=0) : 세로(행)로 정렬
+9. A = np.sort(test, axis=1) : 가로(열)로 정렬
+
+

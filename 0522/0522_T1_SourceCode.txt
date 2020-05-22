@@ -1,0 +1,46 @@
+===================================
+예제 1번
+import numpy as np
+
+array1 = np.array([1,2,3])
+print('array1 type:',type(array1))
+print('array1 array 형태:',array1.shape)
+
+
+=====================================
+예제 2번
+import numpy as np
+
+list1 = [1,2,3]
+
+print(type(list1))
+array1 = np.array(list1)
+print(type(array1))
+print(array1, array1.dtype)
+
+=====================================
+예제 3번
+import numpy as np
+
+zero_array = np.zeros((3,2))//default flaot
+print(zero_array)
+print(zero_array.dtype, zero_array.shape)
+
+one_array = np.ones((3,2))
+print(one_array)
+print(one_array.dtype, one_array.shape)
+
+=======================================
+예제 4번
+import numpy as np
+
+array1 = np.arange(10)
+print('array1:\n', array1)
+
+array2 = array1.reshape(2,5)
+print('array2:\n',array2)
+
+array3 = array1.reshape(5,2)
+print('array3:\n',array3)
+
+

@@ -1,0 +1,18 @@
+
+import numpy as np
+
+list1 = np.array(['John', 'Mike', 'Sarah', 'Kate', 'Samuel'])
+list2 = np.array([78, 95, 84, 98, 88])
+
+#힌트. argsort
+
+# 점수 순서 리스트 정의
+sort_list = np.argsort(list2)
+print(sort_list)
+
+# 1. 시험점수를 오름차순으로 sort
+list2 = np.sort(list2)
+
+# 2. 시험성적에 해당하는 사람의 이름이 매칭되게 sort
+list1 = list1[sort_list]
+print(list1)
