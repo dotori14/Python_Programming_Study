@@ -1,0 +1,25 @@
+import pandas as pd
+import numpy as np
+np.random.seed(12345)
+import matplotlib.pyplot as plt
+plt.rc('figure', figsize=(10, 6))
+PREVIOUS_MAX_ROWS = pd.options.display.max_rows
+pd.options.display.max_rows = 20
+np.set_printoptions(precision=4, suppress=True)
+
+
+data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada', 'Nevada'],
+        'year': [2000, 2001, 2002, 2001, 2002, 2003],
+        'pop': [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
+
+frame = pd.DataFrame(data)
+
+frame2 = pd.DataFrame(data, columns=['year', 'state'
+                                     , 'pop', 'debt'],
+                      index=['one', 'two', 'three', 'four',
+                             'five', 'six'])
+
+print(frame)
+print('-------------------------')
+
+print(frame2)

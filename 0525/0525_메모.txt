@@ -1,0 +1,6 @@
+1. data.index : 인덱스 값 
+2. data > 0 : true/false 리턴
+3. index = statues : 인덱스에 원하는 순서대로 첨삭가능
+4. 
+5. 
+6. 

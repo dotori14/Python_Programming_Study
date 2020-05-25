@@ -1,0 +1,26 @@
+import pandas as pd
+import numpy as np
+np.random.seed(12345)
+import matplotlib.pyplot as plt
+plt.rc('figure', figsize=(10, 6))
+PREVIOUS_MAX_ROWS = pd.options.display.max_rows
+pd.options.display.max_rows = 20
+np.set_printoptions(precision=4, suppress=True)
+
+
+data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada', 'Nevada'],
+        'year': [2000, 2001, 2002, 2001, 2002, 2003],
+        'pop': [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
+frame = pd.DataFrame(data)
+
+frame2 = pd.DataFrame(data, columns=['year', 'state', 'pop', 'debt'],
+                      index=['one', 'two', 'three', 'four',
+                             'five', 'six'])
+print(frame2)
+
+frame2['test'] = frame2['state'] == 'Ohio'
+
+print(frame2)
+
+# obj.index is labels2 : 값이 아닌 완전히 동일한 것으로 구분
+# 동일한 이름의 colum을 만들어도 이용가능, 해당 컬럼을 호출하면 비슷한걸 전부 찾음

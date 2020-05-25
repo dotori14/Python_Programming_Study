@@ -1,0 +1,22 @@
+import pandas as pd
+import numpy as np
+
+np.random.seed(12345)
+import matplotlib.pyplot as plt
+
+plt.rc('figure', figsize=(10, 6))
+PREVIOUS_MAX_ROWS = pd.options.display.max_rows
+pd.options.display.max_rows = 20
+np.set_printoptions(precision=4, suppress=True)
+
+sdata = {'Ohio': 35000, 'Texas': 71000, 'Oregon': 16000, 'Utah': 5000}
+obj3 = pd.Series(sdata)
+#print(obj3)
+print('------------')
+states = ['California', 'Ohio', 'Oregon', 'Texas']
+obj4 = pd.Series(sdata, index=states)
+#print(obj4)
+print('------------')
+
+print(obj3 + obj4)
+  

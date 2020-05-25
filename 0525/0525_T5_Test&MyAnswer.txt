@@ -1,0 +1,42 @@
+import pandas as pd
+import numpy as np
+
+data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada', 'Nevada'],
+        'year': [2000, 2001, 2002, 2001, 2002, 2003],
+        'pop': [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
+
+Division = '-------------------------'
+
+# 인덱스 정보
+참고 = ['one','two','three','four','five','six']
+
+print(Division)
+
+# 1. data를 이용해가지고 DataFrame을 생성. index 정보는 '참고' 데이터 이용
+
+frame = pd.DataFrame(data  , index = 참고)
+print(frame)
+print(Division)
+
+# 2. 'pop' 3.5보다 큰값이 있는 row는 제거.
+
+data = frame[frame['pop'] > 3.5].index
+frame = frame.drop(data)
+print(frame)
+print(Division)
+
+# 3. 'pop' 2보다 작으면 + 1 하여서 Series 형태로 프린트
+
+data = frame[frame['pop'] < 2].index
+data_series = frame['pop']
+test = data_series[data] + 1
+print(test)
+print(Division)
+
+# 4. 'pop' 2보다 크면 + 2 Series 형태로 프린트. 
+
+data = frame[frame['pop'] > 2].index
+data_series = frame['pop']
+test = data_series[data] + 2
+print(test)
+print(Division)
