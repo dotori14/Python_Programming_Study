@@ -1,0 +1,79 @@
+from numpy import nan as NA
+import pandas as pd
+
+data = pd.Series([1, NA, 3.5, NA, 7])
+
+obj3 = pd.Series(['1', '2', '3','4','5','6'], index=[1, 2, 3, 4, 5, 6])
+
+# 데이터 프레임을 사용해서, 전체를 14로 잡고, 필요없는 값 삭제
+
+obj3 = pd.DataFrame(obj3.values, columns=['value'], index=obj3.index*2)
+#print(obj3)
+#print(Division)
+
+obj4 = obj3.reindex(range(14), method='ffill')
+#print(obj4)
+#print(Division)
+
+obj4 = obj4.shift(-1)
+#print(obj4)
+#print(Division)
+
+obj5 = obj4.dropna(axis = 0)
+#print(obj5)
+
+# =========================================
+# 데이터 프레임을 사용해서, 인덱스 값 맞추기
+
+obj3 = pd.Series(['1', '2', '3','4','5','6'], index=[1, 2, 3, 4, 5, 6])
+
+obj3 = pd.DataFrame(obj3.values, range(6))
+obj3 = pd.DataFrame(obj3.values, columns=['value'], index=obj3.index*2)
+#print(obj3)
+#print(Division)
+
+obj4 = obj3.reindex(range(12), method='ffill')
+obj4.index += 1
+#print(obj4)
+
+# =========================================
+# 데이터 프레임 없이, 값에 맞추기
+# MyAnswer
+obj3 = pd.Series(['1', '2', '3','4','5','6'], index=[1, 2, 3, 4, 5, 6])
+
+obj3.index = (obj3.index-1)*2
+obj4 = obj3.reindex(range(12), method='ffill')
+obj4.index += 1
+#print(obj4)
+
+# ========================================
+# 데이터 프레임 없이, 전부 사용해하기
+# Answer
+
+obj3 = pd.Series(['1', '2', '3','4','5','6'], index=[1, 2, 3, 4, 5, 6])
+
+obj3.index *= 2
+obj4 = obj3.reindex(range(1,13), method='ffill')
+obj4 = obj4.shift(-1)
+obj4 = obj4.fillna(6)
+print(obj4)
+
+# ========================================
+# 참고자료
+#obj4 = obj4.reshape()
+#obj3.index
+#obj3.values
+#reindex method = 'ffill'
+#shift 
+#fillna
+
+ 
+
+
+
+
+
+
+
+
+

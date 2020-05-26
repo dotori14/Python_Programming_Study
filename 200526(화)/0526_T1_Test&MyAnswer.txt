@@ -1,0 +1,43 @@
+import pandas as pd
+import numpy as np
+np.random.seed(12345)
+import matplotlib.pyplot as plt
+plt.rc('figure', figsize=(10, 6))
+PREVIOUS_MAX_ROWS = pd.options.display.max_rows
+pd.options.display.max_rows = 20
+np.set_printoptions(precision=4, suppress=True)
+
+
+data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada', 'Nevada'],
+        'year': [2000, 2001, 2002, 2001, 2002, 2003],
+        'pop': [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
+
+frame2 = pd.DataFrame(data, columns=['year', 'state', 'pop', 'debt'],
+                      index=['one', 'two', 'three', 'four',
+                             'five', 'six'])
+
+Division = '-----------------------------------------------'
+
+#1. 2001년 이후의 데이터를 사용하기위해서 
+#year > 2001 데이터를 사용. 새로운 column생성. 
+
+print(Division)
+frame2['check1'] = frame2['year'] > 2001
+print(frame2)
+print(Division)
+
+#2. state = nevada 인것을 체크하기 column 생성.
+
+frame2['check2'] = frame2['state'] == 'Nevada'
+print(frame2)
+print(Division)
+
+#3. 이 두개의 column 정보를 이용하여서 2001년이후데이터 이면서
+#지역이 nevada 인 row 값을 print. +
+
+frame2_bool =  (frame2['state'] == 'Nevada') & (frame2['year'] > 2001)
+frame_bool = frame2[(frame2['check1']) & (frame2['check2'])]
+print(frame2[frame_bool])
+# print(frame_bool)
+print(Division)
+

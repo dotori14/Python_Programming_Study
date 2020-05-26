@@ -1,0 +1,14 @@
+import pandas as pd
+import numpy as np
+from numpy import nan as NA
+
+
+data = pd.Series([1., -999., 2., -999., -1000., 3.])
+
+print(data)
+print('------------------')
+print(data.replace(-999, 1))
+print('------------------')
+print(data.replace([-999, -1000], [1, 2]))
+
+

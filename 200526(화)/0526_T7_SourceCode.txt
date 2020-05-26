@@ -1,0 +1,23 @@
+import numpy as np
+import pandas as pd
+
+from numpy import nan as NA
+
+df = pd.DataFrame(np.random.randn(6, 3))
+df.iloc[2:, 1] = NA
+df.iloc[4:, 2] = NA
+
+print()
+print(df)
+print()
+print(df.fillna(method='ffill', limit = 2))
+print()
+print(df.fillna(df.mean()))
+
+# ¸Çµé¸Çµéºýºý
+# ¹Î¸Ó¸®¸Ó¸Ó¸®¸Çµé¸Åµé
+
+
+
+
+

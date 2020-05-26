@@ -1,0 +1,29 @@
+import numpy as np
+import pandas as pd
+
+string_data = pd.Series(['aardvark', 'artichoke', np.nan, 'avocado'])
+
+
+# print(string_data.isnull())
+# print()
+# 빈값 찾기
+# print(string_data[string_data.isnull()])
+# print()
+# 채워진값 찾기
+# print(string_data[string_data.notnull()])
+# print()
+
+from numpy import nan as NA
+
+data = pd.Series([1, NA, 3.5, NA, 7])
+# print(data.dropna())
+
+data = pd.DataFrame([[1., 6.5, 3.], [1., NA, NA],
+                     [NA, NA, NA], [NA, 6.5, 3.]])
+
+# 열/행
+#print(data.dropna(axis=1))
+# 전부 널값일 경우
+#print(data.dropna(how='all'))
+# 열이 전부 널값일 경우
+#print(data.dropna(axis=1, how='all'))

@@ -1,0 +1,23 @@
+import numpy as np
+import pandas as pd
+
+from numpy import nan as NA
+
+data = pd.DataFrame([[1., 6.5, 3.], [1., NA, NA],
+                     [NA, NA, NA],[NA, NA, NA],[NA, NA, NA], [NA, NA, 3.], [NA, 2, 3.]])
+
+
+# 1. row 3까지 바로 위의 데이터로 결측 데이터를 채운다
+                
+data[0] = data[0].fillna(method='ffill', limit = 2)
+data[1] = data[1].fillna(method='ffill', limit = 3)
+data[2] = data[2].fillna(method='ffill', limit = 3)
+
+print(data)
+print('----------------------------------------')
+
+# 2. 결측값이 2개 이상인 row는 제거
+
+#data = data.dropna(thresh=2)
+data = data.dropna(thresh=6, axis=1)
+print(data)

@@ -1,0 +1,50 @@
+import numpy as np
+import pandas as pd
+
+from numpy import nan as NA
+
+data = pd.DataFrame({'k1': ['one', 'two'] * 3 + ['two'],
+                     'k2': [1, 1, 2, 3, 3, 4, 4]})
+
+#print(data)
+#print("-----------------------")
+
+# 동일한 값을 찾는 순간, True
+check = data.duplicated()
+#print(check)
+#print("-----------------------")
+
+# ======================================
+
+data = pd.DataFrame({'food': ['bacon', 'pulled pork', 'bacon',
+                              'Pastrami', 'corned beef', 'Bacon',
+                              'pastrami', 'honey ham', 'nova lox'],
+                     'ounces': [4, 3, 12, 6, 7.5, 8, 3, 5, 6]})
+
+category = {'bacon'         : 'pig',
+            'pulled pork'   : 'pig',
+            'pastrami'      : 'cow',
+            'corned beef'   : 'cow',
+            'honey ham'     : 'pig',
+            'nova lox'      : 'salmon'}
+
+lower_case = data['food'].str.lower()
+
+# 소문자로 통일
+print(lower_case)
+print("-----------------------")
+
+# 해당 값 중복여부 체크
+print(data['food'].str.lower().duplicated())
+print("-----------------------")
+
+# 카테고리로 적용
+data_list = lower_case.map(category)
+print(data_list)
+print("-----------------------")
+
+# animal 열 추가
+data['animal'] = data_list
+print(data)
+print("-----------------------")
+

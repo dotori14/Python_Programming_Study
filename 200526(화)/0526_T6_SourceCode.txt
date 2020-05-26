@@ -1,0 +1,26 @@
+import numpy as np
+import pandas as pd
+
+string_data = pd.Series(['aardvark', 'artichoke', np.nan, 'avocado'])
+
+from numpy import nan as NA
+data = pd.Series([1, NA, 3.5, NA, 7])
+
+data = pd.DataFrame([[1., 6.5, 3.], [1., NA, NA],
+                     [NA, NA, NA], [NA, 6.5, 3.]])
+
+
+df = pd.DataFrame(np.random.randn(7, 3))
+
+#print(df)
+
+df.iloc[:4,1] = NA
+df.iloc[:2,2] = NA
+print(df)
+# thresh는 살아있는 값, 그 이상만 출력
+print('--------------------------------')     
+#print(df.dropna(thresh = 1))
+print('--------------------------------')     
+#print(df.dropna(thresh = 3))
+print('--------------------------------')     
+print(df.fillna({1:0.5, 2:0.7}))

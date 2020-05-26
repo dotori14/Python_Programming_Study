@@ -1,0 +1,14 @@
+import pandas as pd
+import numpy as np
+
+# reindex로 method로 추가 기능 가능 (ffill : 이전 값으로 빈값 채움)
+# 특정한 상황에서만 사용, 인덱스 순서가 순서대로가 아니면 오류터짐
+
+obj3 = pd.Series(['blue', 'purple', 'yellow'], index=[0, 2, 4])
+print(obj3)
+obj4 = obj3.reindex(range(6), method='ffill')
+print(obj4)
+
+# 미루기
+obj4 = obj4.shift(1)
+print(obj4)

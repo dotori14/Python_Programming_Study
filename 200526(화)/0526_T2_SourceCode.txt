@@ -1,0 +1,11 @@
+import pandas as pd
+import numpy as np
+
+# reindex로 순서 재정의 및 추가 인덱스를 넣을 수  있다.
+
+obj = pd.Series([4.5, 7.2, -5.3, 3.6], index=['d', 'b', 'a', 'c'])
+print(obj)
+print('-------------')
+obj2 = obj.reindex(['a', 'b', 'c', 'd', 'e'])
+print(obj2)
+
