@@ -1,0 +1,44 @@
+import pandas as pd
+import numpy as np
+
+data = ({'food': ['bacon', 'pulled pork', 'bacon',
+                              'Pastrami', 'corned beef', 'Bacon',
+                              'pastrami', 'honey ham', 'nova lox'],
+                     'ounces': [4, 3, 12, 6, 7.5, 8, 3, 5, 6]})
+
+frame = pd.DataFrame(data)
+
+Division = '----------------------------------'
+
+# 1.  'food' column 데이터 대문자로 변환
+
+upper_case = frame['food'].str.upper()
+
+# 중복값만 대문자로 바꾸는 방식 (실패... set을 안하는)
+duplicate_list = upper_case.duplicated()
+#print(duplicate_list)
+#print(Division)
+
+#frame[duplicate_list]['food'].str = frame[duplicate_list]['food'].str.upper()
+#print(frame[duplicate_list]['food'] )
+
+# 전부 대문자로 바꾸는 방식
+frame['food'] = frame['food'].str.upper()
+print(frame)
+print(Division)
+
+# 2. 'food' column element 카테고리별로 정리할수있는 딕셔너리 생성
+
+dic = { 'BACON' : '1', 'PULLED PORK' :'2' , 'PASTRAMI':'3' , 'CORNED BEEF':'4' , 'HONEY HAM' : '5', 'NOVA LOX' : '6' }
+
+# 3. 해당 맵핑용 딕셔너리 변수 이용하여서 column 생성 'number'
+
+frame['number'] = upper_case.map(dic)
+#print(frame)
+#print(Division)
+
+# 4. BACON -> pig , PASTRAMI -> pasta (replace) 
+
+frame['food'] = frame['food'].replace(['BACON', 'PASTRAMI'], ['pig', 'pasta'])
+print(frame)
+print(Division)

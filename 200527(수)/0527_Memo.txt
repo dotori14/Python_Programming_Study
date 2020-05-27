@@ -1,0 +1,4 @@
+0526 복습 키워드
+1. reindex
+2. dropna
+3. fillna

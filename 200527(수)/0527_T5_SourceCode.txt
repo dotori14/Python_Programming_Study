@@ -1,0 +1,35 @@
+
+import pandas as pd
+import numpy as np
+
+
+# 1000개 4열
+data = pd.DataFrame(np.random.randn(1000, 4))
+
+# 절댓값 변환
+#print(np.abs(data))
+#print(np.abs(data) > 3)
+
+bigger = np.abs(data) > 3
+data[bigger] = np.sign(data)*3
+
+check = data[bigger] 
+#print(counts)
+
+#for num in range(3):
+    #print(pd.value_counts(bigger[num]))
+    #print('--------------------')
+    #print(pd.value_counts(check[num]))
+    #print('====================')
+    #print(data[bigger[num]])
+
+# 해당 조건인거 출력
+#print(data[bigger.any(1)])
+# print('------------------------------------------')
+# DataFrame식, 없는건 지우기
+# print(data[bigger].dropna(thresh=1, axis=0))
+
+# 양수/음수 부호 리턴
+# print(np.sign(8))
+
+print(data)

@@ -1,0 +1,25 @@
+
+import pandas as pd
+import numpy as np
+
+
+score = [52, 80, 88, 76, 65, 59, 91, 81, 71, 85, 100, 34, 74, 82, 86, 70, 60, 79, 41, 91, 72, 85]
+
+bins = [30,60,75,81,87,100]
+
+# score안의 데이터는 시험성적이다. 학생들에게 점수를 기준으로
+# 수,우,미,양,가 성적을 학생들에게 부여해야한다. 
+
+# 1. 5개의 각각의 성적을 부여받는 학생들의 숫자가 모두 똑같으려면
+# 점수 범위 설정을 어떻게 해야하는가? 
+
+data = pd.cut(score, bins)
+#print(data.value_counts())
+
+# pd.cut이 Series라서 DataFrame으로 활용할 수도 있다.
+frame = pd.DataFrame(score, columns=['score'])
+frame["aver"] = data
+frame["count"] = data.codes
+
+print(frame)
+

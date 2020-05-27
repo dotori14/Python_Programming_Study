@@ -1,0 +1,36 @@
+import pandas as pd
+import numpy as np
+
+ages = [20, 22, 25, 27, 21, 23, 37, 31, 61, 45, 41, 32]
+
+bins = [18, 25, 35, 60, 100]
+
+num = np.random.rand(20)
+
+# bins를 18~25(0) / 25~35(1) / 35~60(2) / 60~100(3)
+# cut은 나누기
+# cut의 속성 codes는 해당 인덱스의 위치값 리턴 
+# 인덱스 만족하는 값 갯수 리턴
+
+# =============================
+# ages의 값들을 bins를 기준으로 만족하는 값들 (right=False)면 이상/미만
+data = pd.cut(ages, bins, right=False)
+#print(data)
+# ---------------
+# 만족하는 인덱스 위치값 리턴
+#print(data.codes)
+# ---------------
+# ages의 값들을 bins를 기준으로 만족하는 값들 
+# (A,B] : A초과 B이하 
+#print(pd.value_counts(data))
+
+#짜라빠빠
+
+test = pd.cut(num,8, precision=1)
+print(test)
+
+print(test.value_counts())
+
+
+
+

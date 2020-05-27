@@ -1,0 +1,61 @@
+import pandas as pd
+import numpy as np
+from numpy import nan as NA
+
+data = {'state': ['Ohio', 'Ohio', 'Ohio', 'Nevada', 'Nevada', 'Nevada'],
+        'year': [2000, 2001, 2002, 2001, 2002, 2003],
+        'pop': [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
+
+Division = '-------------------------------------'
+
+# 1. reindex를 사용하셔서 'year' column index를 15개 까지 늘리고 
+# 거기에 채우는 값은 이전값 즉,'2003'
+
+year = pd.Series(data['year']).reindex(range(15))
+year.fillna(method='ffill')
+
+#year = pd.Series(data['year'])
+#year = year.reindex(range(15))
+#year = year.fillna(method='ffill')
+
+print(year)
+print(Division)
+
+# 2. dataframe 생성
+
+frame = pd.DataFrame(year,columns=['year'])
+
+# 3. reindex를 사용하셔서 'state' column index를 15개 까지 늘리고 
+# 거기에 채우는 값은 NA
+
+frame['state'] = pd.Series(data['state']).reindex(range(15))
+
+print(frame)
+print(Division)
+
+
+# 4. reindex를 사용하셔서 'pop' column index를 15개 까지 늘리고 
+# 거기에 채우는 값은 NA
+
+frame['pop'] = pd.Series(data['pop']).reindex(range(15))
+
+print(frame)
+print(Division)
+
+# 5. 'state' column은 2개까지만 이전값으로 채우세요. 
+
+frame['state'] = frame['state'].fillna(method='ffill', limit = 2)   
+print(frame)
+print(Division)
+
+# 6. 'pop' column 은 3개까지만 1값으로 채우세요
+
+frame['pop'] = frame['pop'].fillna(1, limit=3)   
+print(frame)
+print(Division)
+
+# 7. '열'을 기준으로 데이터가 9개 이상이 안되는 column은 버려주세요. 
+
+frame = frame.dropna(thresh=9, axis=1)
+print(frame)
+print(Division)
