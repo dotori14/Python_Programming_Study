@@ -1,0 +1,26 @@
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({'key': ['b?c', 'b?h', 'a?u', 'a?c', 'q?a', 't?b'],
+'data': range(6)})
+
+data_list = []
+
+# 해당 값 '?'로 분해후, data_list에 저장
+for x in df['key']:
+    data_list.extend(x.split('?'))
+    
+# 중복값 삭제 (인덱스 처리)
+index = pd.unique(data_list)
+
+# 길이 늘리기
+zerodata = np.zeros((len(df),len(index)))
+dummies = pd.DataFrame(zerodata, columns = index )
+
+# 해당 값에 1 넣기
+for i, key in enumerate(df['key']):
+     temp = dummies.columns.get_indexer(key.split('?'))
+     dummies.iloc[i , temp] = 1
+     
+# 합치기   
+df = df.join(dummies.add_prefix('Count__'))  

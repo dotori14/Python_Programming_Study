@@ -1,0 +1,25 @@
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({'key': ['b', 'b', 'a', 'c', 'a', 'b'],
+                   'data1': range(6)})
+
+
+#print(df)
+#print(pd.get_dummies(df['key']))
+dummy = pd.get_dummies(df['key'], prefix='key')
+
+dummies = df[['data1']].join(dummy)
+
+movies_name = ['movie_id','title','genres']
+movies = pd.read_table('D:/temp/movies.dat', sep='::' , header=None , names=movies_name)
+
+
+
+all_genres = []
+
+for x in movies['genres']:
+    all_genres.extend(x.split('|'))
+
+genres = pd.unique(all_genres)
+#print(all_genres)    

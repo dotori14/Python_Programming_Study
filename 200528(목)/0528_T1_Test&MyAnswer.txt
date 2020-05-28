@@ -1,0 +1,35 @@
+import pandas as pd
+import numpy as np
+
+data = pd.DataFrame(np.random.randn(2000, 4))
+
+# 1. 주어진 데이터를 첫번째 column을 기준으로 5개의 균등한
+# 영역으로 데이터를 구분, 가장 데이터가 적게 포진된 영역의
+# 최소(or최대)값을 기준으로 안쪽으로 +-1 만큼 데이터가 벗어나지않게
+# 하는것이 목적이다. 
+
+test = pd.cut(data[0], 5)#, precision=1)
+check = pd.value_counts(test)
+
+# 분포도 체크
+print(check)
+print()
+# 분포도중 적게 포진된 영역 추출
+print(check.idxmin())
+
+# 절대값 추출
+left = np.abs(check.idxmin().left)
+right = np.abs(check.idxmin().right)
+# 해당 영억, 왼쪽 = +1 / 오른쪽 = -1
+if left > right:
+    num = check.idxmin().left+1
+    bigger = data < num
+    data[bigger] = num
+else:
+    num = check.idxmin().right-1
+    bigger = data > num
+    data[bigger] = num
+
+print(num)
+print()
+print(data)

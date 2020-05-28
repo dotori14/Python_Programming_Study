@@ -1,0 +1,28 @@
+import pandas as pd
+import numpy as np
+
+movies_name = ['movie_id','title','genres']
+movies = pd.read_table('C:/TEMP/movies.dat', sep='::' , header=None , names=movies_name)
+
+all_genres = []
+
+# 분할해서 넣음
+for x in movies['genres']:
+    all_genres.extend(x.split('|'))
+
+# 중복값 지우기
+genres = pd.unique(all_genres)   
+
+# 틀로 작성
+zerodata = np.zeros((len(movies), len(genres)))
+dummies = pd.DataFrame(zerodata, columns = genres)
+
+# 해당 범위 1 넣기
+for index, i in enumerate(movies['genres']):
+    test = dummies.columns.get_indexer(i.split('|'))
+    dummies.iloc[index, test] = 1
+    
+
+
+final_data = movies.join(dummies.add_prefix('Genre__'))
+

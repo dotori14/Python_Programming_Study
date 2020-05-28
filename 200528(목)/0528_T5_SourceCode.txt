@@ -1,0 +1,32 @@
+import numpy as np
+import pandas as pd
+PREVIOUS_MAX_ROWS = pd.options.display.max_rows
+pd.options.display.max_rows = 20
+np.random.seed(12345)
+import matplotlib.pyplot as plt
+import matplotlib
+plt.rc('figure', figsize=(10, 6))
+np.set_printoptions(precision=4, suppress=True)
+
+data = np.arange(10)
+data1 = np.arange(1,100,10)
+
+#plt.plot(data)
+
+fig = plt.figure()
+
+ax1 = fig.add_subplot(2,2,1)
+ax2 = fig.add_subplot(2,2,3)
+ax3 = fig.add_subplot(2,2,2)
+
+
+plt.plot(np.random.randn(50).cumsum(),'k--')
+
+#axe = plt.subplots(2,3)
+#print(axe)
+
+test = np.random.randn(100)
+test1 = pd.value_counts(test)
+print(test1)
+
+ax1.hist(test, bins=100)
