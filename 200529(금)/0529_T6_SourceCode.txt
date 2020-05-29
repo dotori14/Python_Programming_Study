@@ -1,0 +1,21 @@
+from sklearn.datasets import load_iris
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+import pandas as pd
+
+iris = load_iris()
+
+iris_data = iris.data
+iris_label = iris.target
+iris_names = iris.target_names
+iris_feature_names = iris.feature_names
+
+df = pd.DataFrame(data = iris_data, columns = iris_feature_names)
+df['label'] = iris_label
+
+# test_size=0.2 : 150개 쪼개서 120(train용) 30(test용)으로 분류
+X_train, X_test, y_train, y_test = train_test_split(iris_data, iris_label, 
+                                                    test_size=0.2, random_state=11)
+df_clf = DecisionTreeClassifier()
+
+data = df_clf.fit(X_train, y_train)

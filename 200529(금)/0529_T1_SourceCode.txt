@@ -1,0 +1,30 @@
+import numpy as np
+import pandas as pd
+PREVIOUS_MAX_ROWS = pd.options.display.max_rows
+pd.options.display.max_rows = 20
+np.random.seed(12345)
+import matplotlib.pyplot as plt
+import matplotlib
+plt.rc('figure', figsize=(10, 6))
+np.set_printoptions(precision=4, suppress=True)
+
+# 시리즈를 그래프로
+s = pd.Series(np.random.randn(10).cumsum(), index=np.arange(0, 100, 10))
+s.plot()
+
+# cumsum : 이전값 + 지금값 누적
+#print(np.random.randn(10).cumsum())
+
+# 데이터 프레임을 그래프로
+df = pd.DataFrame(np.random.randn(10, 4).cumsum(0),
+                  columns=['A', 'B', 'C', 'D'],
+                  index=np.arange(0, 100, 10))
+print(df)
+df.plot()
+
+# 리스트로 문장받으면 쪼개줌 + .bar()
+fig, axes = plt.subplots(2, 1)
+data = pd.Series(np.random.rand(16), index=list('abcdefghijklmnop'))
+data.plot.bar()
+
+print(list('abcdefghijklmnop'))

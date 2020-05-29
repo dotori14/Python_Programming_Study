@@ -1,0 +1,19 @@
+import numpy as np
+import pandas as pd
+PREVIOUS_MAX_ROWS = pd.options.display.max_rows
+pd.options.display.max_rows = 20
+np.random.seed(12345)
+import matplotlib.pyplot as plt
+import matplotlib
+plt.rc('figure', figsize=(10, 6))
+np.set_printoptions(precision=4, suppress=True)
+
+url = 'C:/Users/W15 201/Desktop/tips.csv'
+
+tips = pd.read_csv(url)
+
+
+party_counts = pd.crosstab(tips['day'], tips['size'])
+print(type(party_counts))
+
+party_counts.plot.bar()

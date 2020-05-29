@@ -1,0 +1,16 @@
+import pandas as pd
+
+titanic_df = pd.read_csv('C:/Users/W15 201/Desktop/titanic/train.csv')
+#print('titanic º¯¼ö type:',type(titanic_df))
+
+#titanic_df.info()
+
+bool_age  = titanic_df[titanic_df['Age']>60][['Name','Age']].head(3)
+
+print(bool_age)
+print()
+print(titanic_df['Pclass'].value_counts())
+print()
+print(titanic_df[(titanic_df['Age']>60) 
+      & (titanic_df['Pclass']==1) 
+      & (titanic_df['Sex']=='female')])

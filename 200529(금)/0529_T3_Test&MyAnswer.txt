@@ -1,0 +1,46 @@
+import numpy as np
+import pandas as pd
+PREVIOUS_MAX_ROWS = pd.options.display.max_rows
+pd.options.display.max_rows = 20
+np.random.seed(12345)
+import matplotlib.pyplot as plt
+import matplotlib
+plt.rc('figure', figsize=(10, 6))
+np.set_printoptions(precision=4, suppress=True)
+
+url = 'C:/Users/W15 201/Desktop/tips.csv'
+tips = pd.read_csv(url)
+
+#party_counts = pd.crosstab(tips['day'], tips['size'])
+#print(type(party_counts))
+
+#party_counts.plot.bar()
+
+# 5개로 구분
+# 해당 위치에 해당하는 값 bool값으로 추가
+# 해당 위치에 해당하는 인덱스 리스트 추가
+# 해당 리스트와 요일로 croostab
+# 그걸 그래프로 
+
+index = range(1,10)
+
+# MyAnswer
+
+tips['1~2.8']   = (tips['tip'] >= 1)   & (tips['tip'] < 2.8) 
+tips['2.8~4.6'] = (tips['tip'] >= 2.8) & (tips['tip'] < 4.6) 
+tips['4.6~6.4'] = (tips['tip'] >= 4.6) & (tips['tip'] < 6.4) 
+tips['6.4~8.2'] = (tips['tip'] >= 6.4) & (tips['tip'] < 8.2) 
+tips['8.2~10']  = (tips['tip'] >= 8.2) & (tips['tip'] <= 10) 
+
+tips['tip_total'] = 0
+
+# print(tips['tip_total'][tips['1~2.8']])
+tips['tip_total'][tips['1~2.8']]   = 1 
+tips['tip_total'][tips['2.8~4.6']] = 2 
+tips['tip_total'][tips['4.6~6.4']] = 3
+tips['tip_total'][tips['6.4~8.2']] = 4 
+tips['tip_total'][tips['8.2~10']]  = 5 
+
+tips_counts = pd.crosstab(tips['day'], tips['tip_total'])
+tips_counts.plot.bar()
+

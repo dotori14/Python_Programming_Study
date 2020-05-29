@@ -1,0 +1,18 @@
+import pandas as pd
+
+titanic_df = pd.read_csv('C:/Users/W15 201/Desktop/titanic/train.csv')
+#print('titanic 변수 type:',type(titanic_df))
+
+# groupby : 해당 인덱스별로 정리 + 나이의 평균
+titanic_groupby = titanic_df.groupby(by='Pclass')['Age'].mean()
+
+#print(type(titanic_groupby))
+#print()
+print(titanic_groupby)
+print()
+
+# 해당 정리된 리스트를 카운트
+test = titanic_groupby.count()
+
+#print(test)
+ 
