@@ -1,0 +1,17 @@
+import numpy as np  # 넘파이 패키지 임포트
+import matplotlib.pylab as plt  # 맷플롯립 패키지 임포트
+from sklearn.datasets import load_iris  # 사이킷런 패키지 임포트
+from scipy import misc  # 패키지 임포트
+
+img_rgb = misc.face()  # 컬러 이미지 로드
+print(img_rgb.shape)  # 데이터의 모양
+
+
+plt.subplot(221)
+plt.imshow(img_rgb[:,:,0], cmap=plt.cm.gray)
+plt.subplot(222)
+plt.imshow(img_rgb[:,:,1], cmap=plt.cm.gray)
+plt.subplot(223)
+plt.imshow(img_rgb[:,:,2], cmap=plt.cm.gray)
+
+# http://www.n2n.pe.kr/lev-1/color.htm   

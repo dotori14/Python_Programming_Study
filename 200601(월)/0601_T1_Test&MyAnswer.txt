@@ -1,0 +1,25 @@
+import numpy as np  # 넘파이 패키지 임포트
+import matplotlib.pylab as plt  # 맷플롯립 패키지 임포트
+from sklearn.datasets import load_iris  # 사이킷런 패키지 임포트
+from sklearn.datasets import load_digits  # 패키지 임포트
+
+digits = load_digits()  # 데이터 로드
+
+# 1. index = 0, 10, 20, 30, 1, 11, 21, 31
+# 여덟개의 데이터를 reshape 함수를 사용하여서 8x8의 형태로 수정후 리스트에 저장.
+# 2. 그래프 공간 생성(8개)
+# 3. 위에서 저장한 이미지데이터를 이용하여서
+# 생성한 그래프 공간에 이미지를 그려주세요
+# plt.imshow(8x8데이터)
+
+#print(digits.data)
+
+fig = plt.figure()
+index = [0, 10, 20, 30, 1, 11, 21, 31]
+
+for num in range(8):
+   ax1 = fig.add_subplot(2,4,(num+1))
+   plt.imshow(digits.data[index[num]].reshape(8,8))
+
+
+
