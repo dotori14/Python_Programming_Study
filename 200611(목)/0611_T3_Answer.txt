@@ -1,0 +1,78 @@
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold
+from sklearn.datasets import load_iris
+import numpy as np
+from sklearn.model_selection import StratifiedKFold
+import pandas as pd
+
+iris_data_test = load_iris()
+Feature_data = iris_data_test.data[0:24]
+Target_data = [1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3]
+
+bool_temp = []
+temp_rad_index = []
+temp_feature = []
+each_data_len = [] 
+final_data_temp = []
+final_target_temp = []
+temp_target = []
+
+def MyStratifiedKFold(Feature, target, splits):
+
+    rgen = np.random.RandomState(1)
+    raw_data = pd.Series(target)
+    Target_Unique = raw_data.unique()
+    
+    for i in range(len(Target_Unique)):
+        each_data_len.append(len(raw_data[raw_data == Target_Unique[i]]))
+        temp_rad_index.append(rgen.permutation(each_data_len[i]))
+        temp = (raw_data == Target_Unique[i])
+        temp_feature.append(Feature[temp])
+        np_target = raw_data[temp].to_numpy()
+        temp_target.append(np_target)
+
+    for j in range(len(Target_Unique)):
+        k = int(each_data_len[j]/splits)
+        temp = temp_feature[j]
+        temp1 = temp_target[j]
+        temp2 = temp_rad_index[j]
+        for h in range(splits):
+            final_data_temp.append(temp[temp2[h*k : (h+1)*k]])
+            final_target_temp.append(temp1[temp2[h*k : (h+1)*k]])
+
+    final_data_feature = []
+    final_data_target = []
+    for l in range(splits):
+        temp = []
+        temp1 = []
+        for p in range(len(Target_Unique)):
+            temp.append(final_data_temp[l+(p*splits)])
+            temp1.append(final_target_temp[l+(p*splits)])
+        temp = np.concatenate(temp, axis = 0)
+        temp1 = np.concatenate(temp1, axis = 0)
+        final_data_feature.append(temp)
+        final_data_target.append(temp1)
+    return final_data_feature , final_data_target
+
+
+final_feature , final_target = MyStratifiedKFold(Feature_data, Target_data, 4)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,23 @@
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold
+from sklearn.datasets import load_iris
+import numpy as np
+from sklearn.model_selection import StratifiedKFold
+import pandas as pd
+
+iris_data_test = load_iris()
+Feature_data = iris_data_test.data[0:24]
+Target_data = [1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3]
+
+skf = StratifiedKFold(n_splits=4)
+n_iter=0
+
+for train_index, test_index in skf.split(Feature_data, Target_data):
+    n_iter += 1
+    label_train = Target_data.iloc[train_index]
+    label_test = Target_data.iloc[test_index]
+    print('## 교차 검증: {0}'.format(n_iter))
+    print('학습 레이블 데이터 분포:\n', label_train.value_counts())
+    print('검증 레이블 데이터 분포:\n', label_test.value_counts())

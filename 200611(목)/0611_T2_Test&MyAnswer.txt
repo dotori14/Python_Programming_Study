@@ -1,0 +1,168 @@
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold
+from sklearn.datasets import load_iris
+import numpy as np
+from sklearn.model_selection import StratifiedKFold
+import pandas as pd
+
+iris_data_test = load_iris()
+Feature_data = iris_data_test.data[0:24]
+Target_data = [1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3]
+
+'''
+Target_data = pd.Series(Target_data)
+skf = StratifiedKFold(n_splits=4)
+n_iter=0
+
+for train_index, test_index in skf.split(Feature_data, Target_data):
+    n_iter += 1
+    label_train = Target_data.iloc[train_index]
+    label_test = Target_data.iloc[test_index]
+    print('## 교차 검증: {0}'.format(n_iter))
+    print('학습 레이블 데이터 분포:\n', label_train.value_counts())
+    print('검증 레이블 데이터 분포:\n', label_test.value_counts())
+'''
+
+## ================================================================
+
+def Set_list():
+    
+    # Feature + Target 데이터
+    data_list = np.zeros((Feature_data.shape[0],Feature_data.shape[1]+1))
+    data_list[:,:-1] = Feature_data
+    data_list[:,-1] = Target_data
+    
+    return data_list
+
+# 1. 필요한 기준값 추출
+# 해당 결과값별 데이터 길이와 조건 리스트 저장
+def Get_data(setting_data):
+    
+    global count_list
+    data_list = []  
+    
+    for num in range(len(Tatget_unique)):
+        # 결과값 종류별 갯수 저장
+        count_list.append(len(Target_data[Target_data == Tatget_unique[num]]))
+        # 결과값에 해당하는 행별 저장
+        data_list.append(setting_data[Target_data == Tatget_unique[num]])
+        
+    return data_list
+  
+# 1-2. 랜덤으로 값 재지정   
+def Set_Random(data_list):  
+      
+    random_list = []
+    
+    # 1-2. 랜덤으로 값 재지정
+    random = np.random.RandomState(1)
+    for data in data_list:
+        random_list.append(random.permutation(data))
+        
+    return random_list
+
+# 2. 기준값을 토대로 재분배
+# A만큼 결과값을 동일한 배율로 재분배하기
+def Reshape_data(data_list,standard,count):
+    
+    reshape_list = []
+    
+    for d_count in range(count):   
+            num = 0
+            # 결과값별 정리한 데이터를 돌리면서
+            for data in data_list:
+              # 해당 종류를 A만큼 분배
+              push =  count_list[num]//count
+              # 해당 분배로 순차별 저장
+              for p_count in range(push):
+                  reshape_list.append(data[standard[num]+p_count])
+              standard[num] += push
+              num += 1
+              
+    return reshape_list
+          
+
+# 3. 재분배한 값을 임의의 값, A씩 Reshape하여 final_data에 저장 
+def Get_Result(data_list,standard,count):
+    
+    final_data = []
+    
+    for f_count in range(count):  
+        # 총길이에서 A만큼 분할하여, final_data에 저장
+        push_count = len(Target_data)//count 
+        standard = push_count*f_count
+        final_data.append(data_list[standard:(standard+push_count)])
+
+    return final_data
+    
+# 3-5. x값과 y값 분리
+def Set_XY(data_list):
+    
+    x_data = []
+    y_data = []
+    
+    for data in data_list :
+        x_result = []
+        y_result = []
+        for result in data :
+            x_result.append(result[:4])
+            y_result.append(result[4])
+    
+        x_data.append(x_result)                                   
+        y_data.append(y_result) 
+        
+    return x_data, y_data
+     
+# 4. 해당 데이터를 토대로 분배값 확인
+# 횟수만큼 돌아서
+def Set_data(data_list, X_data, Y_data): 
+       
+    for num in range(len(data_list)):
+        
+        test_x  = []
+        test_y  = []
+        train_x = []
+        train_y = []
+        
+        # 한번씩 전부 테스트에 해당하는 값이 되게 돌리기
+        for index, data in enumerate(X_data):
+    
+            if index == num:
+                test_x.append(data)
+            else:
+                train_x.append(data)
+       
+        # 한번씩 전부 테스트에 해당하는 값이 되게 돌리기
+        for index, data in enumerate(Y_data):
+    
+            if index == num:
+                test_y.append(data)
+            else:
+                train_y.append(data)
+        
+        test_x = pd.DataFrame(test_x)
+        train_x = pd.DataFrame(train_x)
+        print('## 교차 검증: {0}'.format(num))
+        print('학습 데이터 갯수 : {}'.format(train_x.shape[0]))
+        print('검증 데이터 갯수 : {}'.format(test_x.shape[0]))
+        
+# 행을 일정 숫자로 나눈다
+# 순서대로 테스트 값으로 한다.
+# 해당 값의 비율을 동일하게 한다.
+   
+Target_data = pd.Series(Target_data)
+Tatget_unique = Target_data.unique()
+
+count_list = []      
+standard = [0,0,0]
+count = 4
+
+data_list = Set_list()
+data_list = Get_data(data_list)
+data_list = Set_Random(data_list)
+data_list = Reshape_data(data_list, standard, count)    
+data_list = Get_Result(data_list, standard, count)               
+X_data, Y_data = Set_XY(data_list)
+Set_data(data_list, X_data, Y_data)
