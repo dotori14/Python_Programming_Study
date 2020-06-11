@@ -1,0 +1,55 @@
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import KFold
+from sklearn.datasets import load_iris
+import numpy as np
+from sklearn.model_selection import StratifiedKFold
+import pandas as pd
+
+iris = load_iris()
+Feature_data = iris.data[0:24]
+Target_data = [1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3]
+
+#StratifiedKfold 매소드를 만들어보세요, splits = 4를 이용하세요. 
+
+def semi_STF_for_iris24(data_for_feature,splits_num,target_label):
+    iris_df = pd.DataFrame(data_for_feature)
+    iris_df['label'] = target_label
+    iris_df.columns = ['sepal length', 'sepal width', 'petal length', 'petal width', 'label']
+    
+    n_splits = splits_num
+    n_iter = 1
+    
+    iris_sp_1 = iris_df[0:4]
+    iris_sp_2 = iris_df[4:12]
+    iris_sp_3 = iris_df[12:24]
+    
+    while n_iter <= splits_num:    
+        
+        is_frac_1 = iris_sp_1.sample(frac = 1)
+        is_frac_2 = iris_sp_2.sample(frac = 1)
+        is_frac_3 = iris_sp_3.sample(frac = 1)
+        
+        is1 = is_frac_1.reset_index(drop=False, inplace = False)
+        is1 = is1.drop("index", axis =1)
+        is2 = is_frac_2.reset_index(drop=False, inplace = False)
+        is2 = is2.drop("index", axis =1)
+        is3 = is_frac_3.reset_index(drop=False, inplace = False)
+        is3 = is3.drop("index", axis =1)
+        
+        is1_train = is1[0:3]
+        is2_train = is2[0:6]
+        is3_train = is3[0:9]
+        
+        is1_test = is1.drop(is1.index[0:3])
+        is2_test = is2.drop(is2.index[0:6])
+        is3_test = is3.drop(is3.index[0:9])
+        
+        is_total_train = pd.concat([is1_train,is2_train,is3_train],ignore_index = True)
+        is_total_test = pd.concat([is1_test,is2_test,is3_test], ignore_index = True)
+        
+        print("검증번호:{}".format(n_iter))
+        n_iter += 1
+        print("---TRAIN_SET---\n",is_total_train['label'].value_counts(),'\n',"---TEST_SET---\n",is_total_test['label'].value_counts())
+        
+semi_STF_for_iris24(Feature_data, 4, Target_data)  
