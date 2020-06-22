@@ -1,0 +1,60 @@
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+import warnings
+warnings.filterwarnings('ignore')
+
+dt_clf = DecisionTreeClassifier(random_state=156)
+iris_data = load_iris()
+X_train , X_test , y_train , y_test = train_test_split(iris_data.data, iris_data.target,
+                                                       test_size=0.2,  random_state=11)
+
+dt_clf.fit(X_train , y_train)
+
+from sklearn.tree import export_graphviz
+export_graphviz(dt_clf, out_file="tree.dot", class_names=iris_data.target_names , \
+feature_names = iris_data.feature_names, impurity=True, filled=True)
+
+import graphviz
+with open("tree.dot") as f:
+    dot_graph = f.read()
+    
+g = graphviz.Source(dot_graph)
+g.format='svg'
+g.filename = 'test_picture'
+g.directory = 'C:/Users/재후니_패밀리_PC/.spyder-py3'
+g.render(view=True)
+
+import seaborn as sns
+import numpy as np
+
+# feature importance 추출 
+print("Feature importances:\n{0}".format(np.round(dt_clf.feature_importances_, 3)))
+
+# feature별 importance 매핑
+for name, value in zip(iris_data.feature_names , dt_clf.feature_importances_):
+    print('{0} : {1:.3f}'.format(name, value))
+
+
+
+# feature importance를 column 별로 시각화 하기 
+sns.barplot(x=dt_clf.feature_importances_ , y=iris_data.feature_names)
+
+from sklearn.datasets import make_classification
+from matplotlib import pyplot as plt
+import seaborn as sns
+
+plt.title("1개의 독립변수를 가진 가상 데이터")
+X, y = make_classification(n_features=1, n_informative=1,
+                           n_redundant=0, n_clusters_per_class=1, random_state=4)
+plt.scatter(X, y, marker='o', c=y,
+            s=100, edgecolor="k", linewidth=2)
+
+plt.xlabel("$X$")
+plt.ylabel("$y$")
+plt.show()
+
+sns.distplot(X[y == 0], label="y=0")
+sns.distplot(X[y == 1], label="y=1")
+plt.legend()
+plt.show()

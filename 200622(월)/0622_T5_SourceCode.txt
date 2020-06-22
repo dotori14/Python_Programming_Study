@@ -1,0 +1,47 @@
+from sklearn.datasets import make_classification
+import matplotlib.pyplot as plt
+#%matplotlib inline
+
+plt.title("3 Class values with 2 Features Sample data creation")
+X_features, y_labels = make_classification(n_features=2, n_redundant=0, n_informative=2,
+                             n_classes=3, n_clusters_per_class=1,random_state=0)
+
+plt.scatter(X_features[:, 0], X_features[:, 1], marker='o', c=y_labels, s=25, cmap='rainbow', edgecolor='k')
+
+import numpy as np
+def visualize_boundary(model, X, y):
+    fig,ax = plt.subplots()
+    
+    ax.scatter(X[:, 0], X[:, 1], c=y, s=25, cmap='rainbow', edgecolor='k',
+               clim=(y.min(), y.max()), zorder=3)
+    ax.axis('tight')
+    ax.axis('off')
+    xlim_start , xlim_end = ax.get_xlim()
+    ylim_start , ylim_end = ax.get_ylim()
+    
+    model.fit(X, y)
+    xx, yy = np.meshgrid(np.linspace(xlim_start,xlim_end, num=200),np.linspace(ylim_start,ylim_end, num=200))
+    Z = model.predict(np.c_[xx.ravel(), yy.ravel()]).reshape(xx.shape)
+    
+    n_classes = len(np.unique(y))
+    contours = ax.contourf(xx, yy, Z, alpha=0.3,
+                           levels=np.arange(n_classes + 1) - 0.5,
+                           cmap='rainbow', clim=(y.min(), y.max()),
+                           zorder=1)
+
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import export_graphviz
+
+dt_clf = DecisionTreeClassifier().fit(X_features, y_labels)
+visualize_boundary(dt_clf, X_features, y_labels)
+
+export_graphviz(dt_clf, out_file="test.dot",impurity=True, filled=True)
+import graphviz
+with open("test.dot") as f:
+    dot_graph = f.read()
+g = graphviz.Source(dot_graph)
+g.format='svg'
+g.filename = 'test_picture'
+g.directory = 'C:/Users/재후니_패밀리_PC/.spyder-py3'
+g.render(view = True)
