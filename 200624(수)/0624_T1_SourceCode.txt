@@ -1,0 +1,23 @@
+import numpy as np
+import pandas as pd
+import scipy as sp
+from scipy import stats
+from matplotlib import pyplot as plt
+import seaborn as sns
+sns.set()
+
+#print(sp.stats.binom.pmf(k=1, n=2, p=0.5))
+
+np.random.seed(1)
+print(sp.stats.binom.rvs(n = 10, p =0.2, size=5))
+
+binomial = sp.stats.binom(n=10, p=0.2)
+np.random.seed(1)
+rvs_binomial = binomial.rvs(size=10000)
+
+m = np.arange(0,10,1)
+pmf_binomial = binomial.pmf(k = m)
+
+sns.distplot(rvs_binomial, bins = m , kde = False, norm_hist = True, color = 'gray')
+plt.plot(m, pmf_binomial, color = 'black')
+
