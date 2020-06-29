@@ -1,0 +1,64 @@
+import pandas as pd
+import numpy as np 
+import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings("ignore")
+#%matplotlib inline
+
+card_df = pd.read_csv("C:/Users/재후니_패밀리_PC/Desktop/310_23498_compressed_creditcard.csv/creditcard.csv",encoding='latin-1')
+card_df.head(3)
+
+
+# 2. feature 데이터와 target 데이터 분리
+# 3. 결측값 확인 , 데이터 분포 확인
+# 4. train_test_split
+# train_test_split(X_features, y_target, test_size=0.3, random_state=0, stratify=y_target)
+# 5. train 데이터와 test 데이터 class별 분포 계산.
+# 6. LogisticRegression()의 estimator 사용하여서 
+# 7. get_clf_eval() 이용해서  
+
+from sklearn.model_selection import train_test_split
+
+df_copy = card_df.copy()
+df_copy.drop('Time', axis = 1 , inplace = True)
+
+X_feature = df_copy.iloc[:, 0:-1]
+y_target = df_copy.iloc[:, -1]
+
+print(y_target.value_counts()/len(y_target))
+
+X_train, X_test , y_train, y_test = train_test_split(X_feature, y_target, 
+                                                     test_size=0.3, random_state=0, stratify=y_target)
+
+print(y_train.value_counts())
+print(y_test.value_counts())
+print(y_train.value_counts()/len(y_train))
+print(y_test.value_counts()/len(y_test))
+
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import roc_auc_score
+from sklearn.linear_model import LogisticRegression
+
+
+def get_clf_eval(y_test, pred=None, pred_proba=None):
+    confusion = confusion_matrix( y_test, pred)
+    accuracy = accuracy_score(y_test , pred)
+    precision = precision_score(y_test , pred)
+    recall = recall_score(y_test , pred)
+    f1 = f1_score(y_test,pred)
+    # ROC-AUC 추가 
+    roc_auc = roc_auc_score(y_test, pred_proba)
+    print('오차 행렬')
+    print(confusion)
+    # ROC-AUC print 추가
+    print('정확도: {0:.4f}, 정밀도: {1:.4f}, 재현율: {2:.4f},\
+    F1: {3:.4f}, AUC:{4:.4f}'.format(accuracy, precision, recall, f1, roc_auc))
+
+
+lr_clf = LogisticRegression()
+lr_clf.fit(X_train, y_train)
+lr_pred = lr_clf.predict(X_test)
+lr_pre_proba = lr_clf.predict_proba(X_test)[:, 1]
+temp = lr_pred
+
+get_clf_eval(y_test, lr_pred, lr_pre_proba)
