@@ -1,0 +1,18 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+K = [95, 90, 80, 60, 40, 80, 95, 30, 15, 60]
+E = [95, 95, 75, 70, 35, 80, 90, 25, 10, 70]
+
+K = np.array(K)
+E = np.array(E)
+
+
+print(np.var(K))
+print(np.var(E))
+
+print(np.cov(K,E))
+
+print(np.cov(K,E, bias = True))
+
+fig, axs = plt.subplots(figsize=(24,10),nrows=2, ncols=4)
