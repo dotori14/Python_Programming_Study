@@ -1,0 +1,124 @@
+from sklearn.datasets import load_iris
+from sklearn.cluster import KMeans
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+
+# gmm(가우시안믹스처모델?)
+# K-means같은 경우는 점점 중심을 찾아가는 메커니즘이기 때문에 데이터가 원형으로 분포되어있을때는 효과적이다.
+# 하지만 데이터 분포가 직사각형식으로 넓게 분포되어있다면? 유동적으로 다른방식을 써야한다.
+
+# 분산에 루트 -> 표준편차.
+
+iris = load_iris()
+feature_names = ['sepal_length','sepal_width','petal_length','petal_width']
+
+irisDF = pd.DataFrame(data=iris.data, columns=feature_names)
+irisDF['target'] = iris.target
+
+from sklearn.mixture import GaussianMixture
+
+gmm = GaussianMixture(n_components=3, random_state=0).fit(iris.data)
+gmm_cluster_labels = gmm.predict(iris.data)
+
+irisDF['gmm_cluster'] = gmm_cluster_labels
+irisDF['target'] = iris.target
+
+# groupby : target값 기준으로 해당column을 value_counts 해달라.
+iris_result = irisDF.groupby(['target'])['gmm_cluster'].value_counts()
+print(iris_result)
+
+kmeans = KMeans(n_clusters=3, init='k-means++', max_iter=300,random_state=0).fit(iris.data)
+kmeans_cluster_labels = kmeans.predict(iris.data)
+irisDF['kmeans_cluster'] = kmeans_cluster_labels
+iris_result = irisDF.groupby(['target'])['kmeans_cluster'].value_counts()
+print(iris_result)
+
+# -> gmm이 더 좋다는 뜻이 아니라 데이터의 분포에 따라서 더 나은 알고리즘이 있다는 뜻이다..
+
+def visualize_cluster_plot(clusterobj, dataframe, label_name, iscenter=True):
+    if iscenter :
+        centers = clusterobj.cluster_centers_
+        
+    unique_labels = np.unique(dataframe[label_name].values)
+    markers=['o', 's', '^', 'x', '*']
+    isNoise=False
+
+    for label in unique_labels:
+        label_cluster = dataframe[dataframe[label_name]==label]
+        if label == -1:
+            cluster_legend = 'Noise'
+            isNoise=True
+        else :
+            cluster_legend = 'Cluster '+str(label)
+        
+        plt.scatter(x=label_cluster['ftr1'], y=label_cluster['ftr2'], s=70,\
+                    edgecolor='k', marker=markers[label], label=cluster_legend)
+        
+        if iscenter:
+            center_x_y = centers[label]
+            plt.scatter(x=center_x_y[0], y=center_x_y[1], s=250, color='white',
+                        alpha=0.9, edgecolor='k', marker=markers[label])
+            plt.scatter(x=center_x_y[0], y=center_x_y[1], s=70, color='k',\
+                        edgecolor='k', marker='$%d$' % label)
+    if isNoise:
+        legend_loc='upper center'
+    else: legend_loc='upper right'
+    
+    plt.legend(loc=legend_loc)
+    plt.show()
+
+from sklearn.datasets import make_blobs
+X, y = make_blobs(n_samples=300, n_features=2, centers=3, cluster_std=0.5, random_state=0)
+
+
+# plt.scatter(X[:,0],X[:,1]) 이거를 고유벡터에 투영시킨다. 궁금하면 주석해제
+# np.dot : 행렬곱
+# 투영시키는 행위 -> 차원축소에서 했던 개념
+# transformation를 투영함.(고유벡터)
+# 결과는? 나오는 그래프와 같이 나옴.
+transformation = [[0.60834549, -0.63667341], [-0.40887718, 0.85253229]]
+X_aniso = np.dot(X, transformation)
+
+
+clusterDF = pd.DataFrame(data=X_aniso, columns=['ftr1', 'ftr2'])
+clusterDF['target'] = y
+visualize_cluster_plot(None, clusterDF, 'target', iscenter=False)
+
+# kmeans로 먼저 테스트
+# 결과는? 중심값을 찾아가는 메소드라서 데이터들의 중심을 나타내어준다.
+# kmeans는 숫자나오는 메소드가 있다.
+kmeans = KMeans(3, random_state=0)
+kmeans_label = kmeans.fit_predict(X_aniso)
+clusterDF['kmeans_label'] = kmeans_label
+
+visualize_cluster_plot(kmeans, clusterDF, 'kmeans_label',iscenter=True)
+
+# gmm은 중심값을 찾아가는 메소드가 아니다!!
+gmm = GaussianMixture(n_components=3, random_state=0)
+gmm_label = gmm.fit(X_aniso).predict(X_aniso)
+clusterDF['gmm_label'] = gmm_label
+
+visualize_cluster_plot(gmm, clusterDF, 'gmm_label',iscenter=False)
+
+print('### KMeans Clustering ###')
+print(clusterDF.groupby('target')['kmeans_label'].value_counts())
+print('\n### Gaussian Mixture Clustering ###')
+print(clusterDF.groupby('target')['gmm_label'].value_counts())
+
+# p.410
+# dbscan? : 밀도
+# 입실론 : 개별데이터를 중심으로 입실론만큼의 반경을 가지는 을 영역
+# min-points : 영역 안에 최소 몇개의 데이터가 있어야 하는지.
+# corepoints : 영역이 되었을때 중심이 되는 데이터.
+# borderpoints : 영역 안에 있지만 중심은 안되는 데이터 
+# noise : 그냥 밖에있는거.
+
+
+
+
+
+
+

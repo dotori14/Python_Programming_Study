@@ -1,0 +1,83 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jul 22 15:04:05 2020
+
+@author: 한준
+"""
+# 군집화 검증하기
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.datasets import make_blobs
+
+X, y = make_blobs(n_samples=200, n_features=2, centers=3, cluster_std=0.8, random_state=0)
+print(X.shape, y.shape)
+
+# unique값이 3개인것 : center가 3개이니까
+unique, counts = np.unique(y, return_counts=True)
+print(unique,counts)
+
+import pandas as pd
+
+clusterDF = pd.DataFrame(data=X, columns=['ftr1', 'ftr2'])
+clusterDF['target'] = y
+clusterDF.head(3)
+
+target_list = np.unique(y)
+
+markers=['o', 's', '^', 'P','D','H','x']
+
+for target in target_list:
+    target_cluster = clusterDF[clusterDF['target']==target]
+    plt.scatter(x=target_cluster['ftr1'], y=target_cluster['ftr2'], edgecolor='k', marker=markers[target] )
+plt.show()
+
+# init='k-means++' : 처음 center값이 위치하는 곳을 최적의 포지션으로 설정.
+kmeans = KMeans(n_clusters=3, init='k-means++', max_iter=200, random_state=0)
+cluster_labels = kmeans.fit_predict(X)
+clusterDF['kmeans_label']  = cluster_labels
+
+centers = kmeans.cluster_centers_
+unique_labels = np.unique(cluster_labels)
+markers=['o', 's', '^', 'P','D','H','x']
+
+# 군집된 label 유형별로 iteration 하면서 marker 별로 scatter plot 수행. 
+for label in unique_labels:
+    label_cluster = clusterDF[clusterDF['kmeans_label']==label]
+    center_x_y = centers[label]
+    plt.scatter(x=label_cluster['ftr1'], y=label_cluster['ftr2'], edgecolor='k', 
+                marker=markers[label] )
+    
+    # 군집별 중심 위치 좌표 시각화 
+    plt.scatter(x=center_x_y[0], y=center_x_y[1], s=200, color='white',
+                alpha=0.9, edgecolor='k', marker=markers[label])
+    plt.scatter(x=center_x_y[0], y=center_x_y[1], s=70, color='k', edgecolor='k', 
+                marker='$%d$' % label)
+
+plt.show()
+print(clusterDF.groupby('target')['kmeans_label'].value_counts())
+
+# 군집화 : 데이터가 있는데 임의의 타겟값? 을 지정해줌으로써 묶어주는것
+
+# 몇 만큼 cluster가 되었는가?
+# -> 실루엣 계수(s(i)) : 군집화가 얼마나 잘 되어있느냐에 대한 지표.(-1 ~ +1)
+# 1. 같은 cluster끼리는 "분산이 작다".
+# 2. 서로 다른 cluster끼리는 "분산이 크다".
+
+# a1 = means(a12 a13 a14) 내부 cluster들의 평균값 : 가장 가까이에 있는 "내부" cluster.
+# b1 = means(b15 b16 b17 b18) 외부 cluster들의 평균값 : 가장 가까이에 있는 "외부" cluster.
+
+# a1 : 같은 cluster 안에 있는 데이터의 거리의 평균
+# b1 : 가장 가까이에 있는 다른 cluster 안에 있는 데이터의 거리의 평균
+# 실루엣 계수가 클수록 군집화가 잘 되었다.
+# 같은 군집 안에 거리는 좁아지고, B 군집이 멀어지고 -> 최적의 군집화.
+
+# 만약 음수라면 ? 내 군집 안에 다른군집이 들어와있는것.
+
+
+
+
+
+
+

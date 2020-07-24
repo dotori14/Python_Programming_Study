@@ -1,0 +1,39 @@
+from sklearn.datasets import load_iris
+from sklearn.cluster import KMeans
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+
+# gmm(가우시안믹스처모델?)
+# K-means같은 경우는 점점 중심을 찾아가는 메커니즘이기 때문에 데이터가 원형으로 분포되어있을때는 효과적이다.
+# 하지만 데이터 분포가 직사각형식으로 넓게 분포되어있다면? 유동적으로 다른방식을 써야한다.
+
+# 분산에 루트 -> 표준편차.
+
+iris = load_iris()
+feature_names = ['sepal_length','sepal_width','petal_length','petal_width']
+
+irisDF = pd.DataFrame(data=iris.data, columns=feature_names)
+irisDF['target'] = iris.target
+
+from sklearn.mixture import GaussianMixture
+
+gmm = GaussianMixture(n_components=3, random_state=0).fit(iris.data)
+gmm_cluster_labels = gmm.predict(iris.data)
+
+irisDF['gmm_cluster'] = gmm_cluster_labels
+irisDF['target'] = iris.target
+
+# groupby : target값 기준으로 해당column을 value_counts 해달라.
+iris_result = irisDF.groupby(['target'])['gmm_cluster'].value_counts()
+print(iris_result)
+
+kmeans = KMeans(n_clusters=3, init='k-means++', max_iter=300,random_state=0).fit(iris.data)
+kmeans_cluster_labels = kmeans.predict(iris.data)
+irisDF['kmeans_cluster'] = kmeans_cluster_labels
+iris_result = irisDF.groupby(['target'])['kmeans_cluster'].value_counts()
+print(iris_result)
+
+# -> gmm이 더 좋다는 뜻이 아니라 데이터의 분포에 따라서 더 나은 알고리즘이 있다는 뜻이다.

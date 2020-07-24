@@ -1,0 +1,206 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jul 20 11:06:33 2020
+
+@author: 한준
+"""
+
+# Ax = ㅅx 에서 / 람다 : 고유값 , x : 고유벡터
+# 고유값 : 
+# 고유백터 : 
+
+
+
+# p.~181
+
+import pandas as pd
+
+df_wine = pd.read_csv('https://archive.ics.uci.edu/ml/'
+                      'machine-learning-databases/wine/wine.data',
+                      header=None)
+
+df_wine.columns = ['Class label', 'Alcohol', 'Malic acid', 'Ash',
+                   'Alcalinity of ash', 'Magnesium', 'Total phenols',
+                   'Flavanoids', 'Nonflavanoid phenols', 'Proanthocyanins',
+                   'Color intensity', 'Hue',
+                   'OD280/OD315 of diluted wines', 'Proline']
+
+df_wine.head()
+
+from sklearn.model_selection import train_test_split
+
+X, y = df_wine.iloc[:, 1:].values, df_wine.iloc[:, 0].values
+
+X_train, X_test, y_train, y_test = \
+    train_test_split(X, y, test_size=0.3, 
+                     stratify=y,
+                     random_state=0)
+        
+from sklearn.preprocessing import StandardScaler
+
+# 표준화
+sc = StandardScaler()
+X_train_std = sc.fit_transform(X_train)
+X_test_std = sc.transform(X_test)
+
+import numpy as np
+cov_mat = np.cov(X_train_std.T)
+
+# 각각의 고윳값이 크면 클수록 매칭되는 고유벡터가 13개의 선형변환에 영향을 미치는 크기가 크다.
+eigen_vals, eigen_vecs = np.linalg.eig(cov_mat)
+
+print('\n고윳값 \n%s' % eigen_vals)
+
+tot = sum(eigen_vals)
+var_exp = [(i / tot) for i in sorted(eigen_vals, reverse=True)]
+cum_var_exp = np.cumsum(var_exp)
+
+import matplotlib.pyplot as plt
+
+plt.bar(range(1, 14), var_exp, alpha=0.5, align='center',
+        label='individual explained variance')
+plt.step(range(1, 14), cum_var_exp, where='mid',
+         label='cumulative explained variance')
+plt.ylabel('Explained variance ratio')
+plt.xlabel('Principal component index')
+plt.legend(loc='best')
+plt.tight_layout()
+plt.show()
+
+ # (고윳값, 고유벡터) 튜플의 리스트를 만듭니다
+eigen_pairs = [(np.abs(eigen_vals[i]), eigen_vecs[:, i])
+               for i in range(len(eigen_vals))]
+
+# 높은 값에서 낮은 값으로 (고윳값, 고유벡터) 튜플을 정렬합니다
+eigen_pairs.sort(key=lambda k: k[0], reverse=True)
+
+w = np.hstack((eigen_pairs[0][1][:, np.newaxis],
+               eigen_pairs[1][1][:, np.newaxis]))
+
+# 왼쪽거 한줄 고유백터, 오른쪽꺼 한줄 고유백터
+print('투영 행렬 W:\n', w)
+
+X_train_std[0].dot(w)
+
+X_train_pca = X_train_std.dot(w)
+colors = ['r', 'b', 'g']
+markers = ['s', 'x', 'o']
+
+# ----------------------------------------------
+
+for l, c, m in zip(np.unique(y_train), colors, markers):
+    # X_train에서 타겟값이 1인 값, 즉 true를 리턴하는데 0번재 column을 리턴해줘. -> x축으로 쓰임 : pc1
+    plt.scatter(X_train_pca[y_train == l, 0], 
+                
+    # X_train에서 타겟값이 1인 값, 즉 true를 리턴하는데 1번재 column을 리턴해줘. -> y축으로 쓰임 : pc2
+                X_train_pca[y_train == l, 1], 
+                c=c, label=l, marker=m)
+
+plt.xlabel('PC 1')
+plt.ylabel('PC 2')
+plt.legend(loc='lower left')
+plt.tight_layout()
+plt.show()
+
+# 분산 : 평균값을 기준으로 얼마나 떨어졌는지
+# 공분산 : x값에 따른 y값의 변화에 대한 지표
+# 상관계수 : 공분산과 비슷하지만 공분산의 데이터를 표준화시켜서 0~1까지의 범위로 나타낸 것.
+# 고유값 : 어떠한 행렬 A가 있을 때, 선형 변환을 일으키는 수많은 x 중에서 방향은 유지하고 크기만 변화하게 하는 값.
+# 고유백터 : 어떠한 행렬 A가 있을 때, 선형 변환을 일으키는 수많은 x 중에서 방향은 유지하고 크기만 변화하게 하는 x값.
+# cov : 공분산 메트릭스를 뱉어주는 메소드
+
+# 주성분 분석(PCA) : 데이터는 수많은 column으로 이루어져 있는데, 상관관계가 1에 수렴하는(공분산이 큰) column들을 한개의 축으로 줄이는것. Overfitting도 줄일 수 있다.
+# 고유백터를 새로운 축으로 데이터를 재정렬한다.
+# 가장 고유값이 큰 벡터에다가 투영시키는 것이
+# 원본데이터를 손상시키지 않고 축을 줄일 수가 있어서 그럼.
+
+# p.183
+
+# 0722 /////////////////////////////////////////////
+
+
+from matplotlib.colors import ListedColormap
+
+def plot_decision_regions(X, y, classifier, resolution=0.02):
+
+    # 마커와 컬러맵을 준비합니다
+    markers = ('s', 'x', 'o', '^', 'v')
+    colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
+    cmap = ListedColormap(colors[:len(np.unique(y))])
+
+    # 결정 경계를 그립니다
+    x1_min, x1_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    x2_min, x2_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, resolution),
+                           np.arange(x2_min, x2_max, resolution))
+    Z = classifier.predict(np.array([xx1.ravel(), xx2.ravel()]).T)
+    Z = Z.reshape(xx1.shape)
+    plt.contourf(xx1, xx2, Z, alpha=0.4, cmap=cmap)
+    plt.xlim(xx1.min(), xx1.max())
+    plt.ylim(xx2.min(), xx2.max())
+
+    # 클래스 샘플을 표시합니다
+    for idx, cl in enumerate(np.unique(y)):
+        plt.scatter(x=X[y == cl, 0], 
+                    y=X[y == cl, 1],
+                    alpha=0.6, 
+                    c=cmap.colors[idx],
+                    edgecolor='black',
+                    marker=markers[idx], 
+                    label=cl)
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.decomposition import PCA
+
+# n_components : 축의 갯수.
+pca = PCA(n_components=2)
+
+# pca.fit_transform : 공분산 행렬 구하고 -> 고유값 / 고유벡터 구해서 -> 2개의 고유벡터(고윳값이 제일 큰)를
+# 원본데이터에 투영시켜서 2축의 데이터를 만든다  
+X_train_pca = pca.fit_transform(X_train_std)
+X_test_pca = pca.transform(X_test_std)
+
+lr = LogisticRegression(solver='liblinear', multi_class='auto')
+lr = lr.fit(X_train_pca, y_train)
+
+# P.183~4
+# 고유벡터 사용
+# "X_train_pca" 의 모든 점들을 넣었을 때 영역에 해당하는 데이터들은 각각 1,2,3으로 예측했다.
+# ㅁ,X,O은 실제 데이터. 고로 상당히 잘 예측했다.
+plot_decision_regions(X_train_pca, y_train, classifier=lr)
+plt.xlabel('PC 1')
+plt.ylabel('PC 2')
+plt.legend(loc='lower left')
+plt.tight_layout()
+plt.show()
+
+# "X_test_pca" 의 모든 점들을 넣었을 때 영역에 해당하는 데이터들은 각각 1,2,3으로 예측했다.
+# ㅁ,X,O은 실제 데이터. 고로 상당히 잘 예측했다.
+plot_decision_regions(X_test_pca, y_test, classifier=lr)
+plt.xlabel('PC 1')
+plt.ylabel('PC 2')
+plt.legend(loc='lower left')
+plt.tight_layout()
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

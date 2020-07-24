@@ -1,0 +1,67 @@
+import pandas as pd
+import datetime
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+
+retail_df = pd.read_excel(io='C:/Users/김한준/Desktop/소스코드/소스코드/4_머신러닝/2020.07/Online Retail.xlsx')
+retail_df.info()
+temp = retail_df.describe()
+
+retail_df = retail_df[retail_df['Quantity']>0]
+retail_df = retail_df[retail_df['UnitPrice']>0]
+retail_df = retail_df[retail_df['CustomerID'].notnull()]
+
+retail_df.info()
+temp = retail_df.describe()
+
+print(retail_df['Country'].value_counts())
+retail_df = retail_df[retail_df['Country'] =='United Kingdom']
+
+retail_df['sale_amount'] = retail_df['Quantity'] * retail_df['UnitPrice']
+retail_df['CustomerID'] = retail_df['CustomerID'].astype(int)
+
+temp2 = retail_df['CustomerID'].value_counts()
+temp3 = retail_df.groupby('CustomerID')['sale_amount'].sum().sort_values(ascending = False)
+
+aggregations = {
+    'InvoiceDate': 'max',
+    'InvoiceNo': 'count',
+    'sale_amount':'sum'
+}
+cust_df = retail_df.groupby('CustomerID').agg(aggregations)
+
+
+cust_df = cust_df.rename(columns = {'InvoiceDate':'Recency',
+                                    'InvoiceNo':'Frequency',
+                                    'sale_amount':'Monetary'
+                                   }
+                        )
+cust_df = cust_df.reset_index()
+
+import datetime as dt
+cust_df['Recency'] = dt.datetime(2011,12,10) - cust_df['Recency']
+
+print(cust_df.info())
+temp5 = cust_df.describe()
+
+
+cust_df['Recency'] = cust_df['Recency'].apply(lambda x : x.days)
+
+
+
+
+fig, (ax1,ax2,ax3) = plt.subplots(figsize=(12,4), nrows=1, ncols=3)
+ax1.set_title('Recency Histogram')
+ax1.hist(cust_df['Recency'])
+
+ax2.set_title('Frequency Histogram')
+ax2.hist(cust_df['Frequency'])
+
+ax3.set_title('Monetary Histogram')
+ax3.hist(cust_df['Monetary'])
+
+
+
+
+
