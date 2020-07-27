@@ -1,0 +1,127 @@
+from nltk import sent_tokenize
+import nltk
+nltk.download('punkt')
+
+text_sample = 'The Matrix is everywhere its all around us, here even in this room. \
+               You can see it out your window or on your television. \
+               You feel it when you go to work, or go to church or pay your taxes.'
+sentences = sent_tokenize(text=text_sample)
+print(type(sentences),len(sentences))
+print(sentences)
+
+from nltk import word_tokenize
+sentence = "The Matrix is everywhere its all around us, here even in this room."
+words = word_tokenize(sentence)
+print(type(words), len(words))
+print(words)
+
+from nltk import word_tokenize, sent_tokenize
+def tokenize_text(text):
+    
+    sentences = sent_tokenize(text)
+    word_tokens = [word_tokenize(sentence) for sentence in sentences]
+    return word_tokens
+
+word_tokens = tokenize_text(text_sample)
+print(type(word_tokens),len(word_tokens))
+print(word_tokens)
+print(1)
+
+import nltk
+nltk.download('stopwords')
+print('영어 stop words 갯수:',len(nltk.corpus.stopwords.words('english')))
+print(nltk.corpus.stopwords.words('english')[:20])
+print(2)
+
+stopwords = nltk.corpus.stopwords.words('english')
+all_tokens = []
+for sentence in word_tokens:
+    filtered_words=[]
+    for word in sentence:
+        word = word.lower()
+        if word not in stopwords:
+            filtered_words.append(word)
+    all_tokens.append(filtered_words)
+    
+print(all_tokens)
+print(3)
+
+word_tokens = tokenize_text(text_sample)
+print(type(word_tokens),len(word_tokens))
+print(word_tokens)
+print(4)
+
+stopwords = nltk.corpus.stopwords.words('english')
+all_tokens = []
+
+
+stopwords = nltk.corpus.stopwords.words('english')
+all_tokens = []
+for sentence in word_tokens:
+    filtered_words=[]
+    for word in sentence:
+        word = word.lower()
+        if word not in stopwords:
+            filtered_words.append(word)
+    all_tokens.append(filtered_words)
+    
+print(all_tokens)
+print(5)
+
+
+from nltk.stem import LancasterStemmer
+stemmer = LancasterStemmer()
+print(stemmer.stem('working'),stemmer.stem('works'),stemmer.stem('worked'))
+print(stemmer.stem('amusing'),stemmer.stem('amuses'),stemmer.stem('amused'))
+print(stemmer.stem('happier'),stemmer.stem('happiest'))
+print(stemmer.stem('fancier'),stemmer.stem('fanciest'))
+print(6)
+
+from nltk.stem import WordNetLemmatizer
+import nltk
+nltk.download('wordnet')
+
+lemma = WordNetLemmatizer()
+print(lemma.lemmatize('amusing','v'),lemma.lemmatize('amuses','v'),lemma.lemmatize('amused','v'))
+print(lemma.lemmatize('happier','a'),lemma.lemmatize('happiest','a'))
+print(lemma.lemmatize('fancier','a'),lemma.lemmatize('fanciest','a'))
+print(7)
+
+import numpy as np
+dense = np.array( [ [ 3, 0, 1 ], [0, 2, 0 ] ] )
+
+from scipy import sparse
+
+data = np.array([3,1,2])
+row_pos = np.array([0,0,1])
+col_pos = np.array([0,2,1])
+sparse_coo = sparse.coo_matrix((data, (row_pos,col_pos)))
+print(sparse_coo.toarray())
+
+
+
+
+from scipy import sparse
+dense2 = np.array([[0,0,1,0,0,5],
+             [1,4,0,3,2,5],
+             [0,6,0,3,0,0],
+             [2,0,0,0,0,0],
+             [0,0,0,7,0,8],
+             [1,0,0,0,0,0]])
+
+data2 = np.array([1, 5, 1, 4, 3, 2, 5, 6, 3, 2, 7, 8, 1])
+
+row_pos = np.array([0, 0, 1, 1, 1, 1, 1, 2, 2, 3, 4, 4, 5])
+col_pos = np.array([2, 5, 0, 1, 3, 4, 5, 1, 3, 0, 3, 5, 0])
+
+sparse_coo = sparse.coo_matrix((data2, (row_pos,col_pos)))
+print(sparse_coo)
+
+row_pos_ind = np.array([0, 2, 7, 9, 10, 12, 13])
+
+sparse_csr = sparse.csr_matrix((data2, col_pos, row_pos_ind))
+
+print('COO 변환된 데이터가 제대로 되었는지 다시 Dense로 출력 확인')
+print(sparse_coo.toarray())
+print('CSR 변환된 데이터가 제대로 되었는지 다시 Dense로 출력 확인')
+print(sparse_csr.toarray())
