@@ -1,0 +1,88 @@
+import pandas as pd
+review_df = pd.read_csv('C:/Users/재후니_패밀리_PC/Desktop/labeledTrainData.tsv/labeledTrainData.tsv', header=0, sep="\t", quoting=3)
+print(review_df['review'][0])
+
+import re
+review_df['review'] = review_df['review'].str.replace('<br />',' ')
+review_df['review'] = review_df['review'].apply( lambda x : re.sub("[^a-zA-Z]", " ", x) )
+
+from sklearn.model_selection import train_test_split
+class_df = review_df['sentiment']
+feature_df = review_df.drop(['id','sentiment'], axis=1, inplace=False)
+X_train, X_test, y_train, y_test= train_test_split(feature_df, class_df, test_size=0.3, random_state=156)
+X_train.shape, X_test.shape
+
+
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, roc_auc_score
+
+pipeline = Pipeline([
+    ('cnt_vect', CountVectorizer(stop_words='english', ngram_range=(1,2) )),
+    ('lr_clf', LogisticRegression(C=10))])
+
+pipeline.fit(X_train['review'], y_train)
+pred = pipeline.predict(X_test['review'])
+pred_probs = pipeline.predict_proba(X_test['review'])[:,1]
+
+print('예측 정확도는 {0:.4f}, ROC-AUC는 {1:.4f}'.format(accuracy_score(y_test ,pred),
+                                         roc_auc_score(y_test, pred_probs)))
+
+import nltk
+nltk.download('all')
+from nltk.corpus import wordnet as wn
+term = 'present'
+
+# 'present'라는 단어로 wordnet의 synsets 생성. 
+synsets = wn.synsets(term)
+print('synsets() 반환 type :', type(synsets))
+print('synsets() 반환 값 갯수:', len(synsets))
+print('synsets() 반환 값 :', synsets)
+
+for synset in synsets :
+    print('##### Synset name : ', synset.name(),'#####')
+    print('POS :',synset.lexname())
+    print('Definition:',synset.definition())
+    print('Lemmas:',synset.lemma_names())
+
+
+# synset 객체를 단어별로 생성
+tree = wn.synset('tree.n.01')
+lion = wn.synset('lion.n.01')
+tiger = wn.synset('tiger.n.02')
+cat = wn.synset('cat.n.01')
+dog = wn.synset('dog.n.01')
+
+entities = [tree , lion , tiger , cat , dog]
+similarities = []
+entity_names = [ entity.name().split('.')[0] for entity in entities]
+
+for entity in entities:
+    similarity = [ round(entity.path_similarity(compared_entity), 2)  for compared_entity in entities ]
+    similarities.append(similarity)
+
+similarity_df = pd.DataFrame(similarities , columns=entity_names,index=entity_names)
+
+import nltk
+from nltk.corpus import sentiwordnet as swn
+
+senti_synsets = list(swn.senti_synsets('slow'))
+print('senti_synsets() 반환 type :', type(senti_synsets))
+print('senti_synsets() 반환 값 갯수:', len(senti_synsets))
+print('senti_synsets() 반환 값 :', senti_synsets)
+
+import nltk
+from nltk.corpus import sentiwordnet as swn
+
+father = swn.senti_synset('father.n.01')
+print('father 긍정감성 지수: ', father.pos_score())
+print('father 부정감성 지수: ', father.neg_score())
+print('father 객관성 지수: ', father.obj_score())
+print('\n')
+fabulous = swn.senti_synset('fabulous.a.01')
+print('fabulous 긍정감성 지수: ',fabulous .pos_score())
+print('fabulous 부정감성 지수: ',fabulous .neg_score())
+
+
+
