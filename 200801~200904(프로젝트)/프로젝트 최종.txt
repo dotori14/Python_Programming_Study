@@ -1,0 +1,342 @@
+import os
+import re
+import sys
+import urllib.request
+from urllib.request import urlopen
+import json
+from datetime import datetime
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import numpy as np
+import operator
+import tweepy
+import codecs
+
+## json 설치
+## 오퍼레이터 설치
+## 
+
+# Naver API
+client_id       = "W1mQuZToZ9pjFdVBUm1D"
+client_secret   = "p7OLLkJnV4"
+
+# Twitter API
+consumer_key        = "yfjUd887rPr1zg1c4mLPaNDgw"
+consumer_secret     = "I2WnnS6at4fElsexPubGyCnyFxPuRCtePWU1hjnpmXiqR1sVLP"
+access_token        = "1296692703686586368-2bR6Xp7RZHei5K2cFhX1lYwHsquvlf"
+access_token_secret = "tOQt8jsWCdlXBSVMlHxUncVcxJiLM17EZqRWqjmIp1jKZ"
+
+time = str(datetime.today()).split(' ')[0]
+year = str(datetime.today().year)
+
+# Naver Opne API : 번역 
+def translate_keyword(keyword):
+    
+    # 파파고 번역 API : 키워드를 영문으로 번역
+    encText = urllib.parse.quote(keyword)
+    data = "source=ko&target=en&text=" + encText
+    url = "https://openapi.naver.com/v1/papago/n2mt"
+    request = urllib.request.Request(url)
+    request.add_header("X-Naver-Client-Id",client_id)
+    request.add_header("X-Naver-Client-Secret",client_secret)
+    response = urllib.request.urlopen(request, data=data.encode("utf-8"))
+    rescode = response.getcode()
+    if(rescode==200):
+        response_body = response.read()
+        #json 형 변환
+        find = json.loads(response_body.decode('utf-8'))       
+        return find['message']['result']['translatedText']
+    else:
+        print("Error Code:" + rescode)
+        return None
+  
+# Naver Opne API : 검색 트렌드    
+def trand_keyword(keyword,translated):
+       
+    # 키워드 트렌드 API    
+    url = "https://openapi.naver.com/v1/datalab/search";
+    body = "{\"startDate\":\""+year+"-01-01\",\"endDate\":\""+time+"\",\"timeUnit\":\"month\",\"keywordGroups\":[{\"groupName\":\"인기 키워드\",\"keywords\":[\""+keyword+"\",\""+translated+"\"]}]}";
+    request = urllib.request.Request(url)
+    request.add_header("X-Naver-Client-Id",client_id)
+    request.add_header("X-Naver-Client-Secret",client_secret)
+    request.add_header("Content-Type","application/json")
+    response = urllib.request.urlopen(request, data=body.encode("utf-8"))
+    rescode = response.getcode()
+    if(rescode==200):
+        response_body = response.read()
+        data = json.loads(response_body.decode('utf-8'))        
+        df = pd.DataFrame(data['results'][0]['data'])
+        # 언급 타이밍 추측
+        if df.iloc[1:0].empty:        
+            countMonth = 0
+        else :           
+            maxMonth = pd.to_datetime(df['period'][df.max(axis=1).idxmax()]).month
+            countMonth = datetime.today().month-maxMonth
+        # 키워드/언급 기간 리턴
+        return pd.Series({'Keyword': keyword, 'Mention': countMonth})   
+                
+    else:
+        print("Error Code:" + rescode)
+   
+# Selenium : 검색
+def Find_RelationKeyword(keyword):
+        
+    # url 로딩
+    driver.get('https://blackkiwi.net/')
+  
+    # 검색창 검색
+    elem = driver.find_element_by_id("search_field")    
+    elem.send_keys(keyword)    
+    
+    elem = driver.find_element_by_id("search_btn")
+    elem.click()
+    
+# 분석 기준 데이터 불러오기
+def Set_Posneg():
+    
+    global positive
+    positive = []
+    negative = [] 
+    data = [] 
+    
+    pos = codecs.open("./positive_words_self.txt", 'rb', encoding='UTF-8') 
+    while True: 
+        line = pos.readline() 
+        line = line.replace('\n', '') 
+        positive.append(line) 
+        data.append(line) 
+        if not line: break 
+    
+    data.pop()
+    pos.close() 
+    
+    neg = codecs.open("./negative_words_self.txt", 'rb', encoding='UTF-8') 
+    
+    while True: 
+        line = neg.readline() 
+        line = line.replace('\n', '') 
+        negative.append(line) 
+        data.append(line) 
+        if not line: break 
+    
+    data.pop()
+    neg.close()
+
+    return data
+    
+# 웹 크롤링/감성분석 : 키워드의 뉴스기사 감정 분석    
+def Get_NewsEmotionData(num, keyword):
+      
+    # 웹크롤링으로 기사 제목 추출
+    resultData = pd.DataFrame(index=range(0), columns=['Keyword', 'NewsTitle'])
+    url = f'https://search.naver.com/search.naver?where=news&sm=tab_jum&query={keyword}'    
+    r = requests.get(url)
+    soup = BeautifulSoup(r.text, 'html.parser')
+    news_titles = soup.select('.news .type01 li dt a[title]')   
+    # 데이터 선언
+    label = [0] * len(news_titles) 
+    j = 0
+    
+    # 제목별로 감정 분석
+    for title in news_titles:
+        title_data = title['title']
+        title_data = re.sub('[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…\”\“》]', '', title_data) 
+
+        for i in range(len(posneg)): 
+            posflag = False 
+            negflag = False 
+            if i < (len(positive)):  
+                if title_data.find(posneg[i]) != -1: 
+                    posflag = True
+                    break 
+            else : 
+                if title_data.find(posneg[i]) != -1: 
+                    negflag = True 
+                    break 
+        if posflag == True: 
+            label[j] = 1
+        elif negflag == True: 
+            label[j] = -1 
+        elif negflag == False and posflag == False: 
+            label[j] = 0 
+        j = j + 1
+     
+    # 해당 데이터별 분류
+    data = [label.count(1), label.count(0), label.count(-1)]   
+    index, value = max(enumerate(data), key=operator.itemgetter(1))
+    
+    if len(label) != 0:
+        ratio = float(value / len(label))
+    else:
+        ratio = 0.0
+        
+    if index == 0:
+        emotype = '긍정' 
+    elif index == 1:
+        emotype = '중립' 
+    elif index == 2:
+        emotype = '부정' 
+        
+    # 인덱스 (긍정/중립/부정), 해당 비율
+    return pd.Series(data={'News': emotype, 'News_ratio': ratio}) 
+   
+# 웹 크롤링/감성분석 : 키워드의 트위터 감정 분석    
+def Get_TwitterEmotionData(text):
+    
+        text_data = re.sub('[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…\”\“》]', '', text) 
+
+        for i in range(len(posneg)): 
+            if i < (len(positive)): 
+                if text_data.find(posneg[i]) != -1: 
+                    return "긍정"
+            else : 
+                if text_data.find(posneg[i]) != -1: 
+                    return "부정"
+                
+        return "중립"
+
+# 접속할 사이트 지정    
+def Get_SiteNum():
+    
+    while True:
+        
+        Flag = False
+        print("\n========================")
+        print("빅데이터 분석 사이트")
+        print("------------------------")
+        for index, data in enumerate(SiteList) :
+            print(" " + str(index) + ". " + data)
+        print("========================")
+        
+        choose = int(input('원하는 사이트 넘버링을 써주세요.\n'))
+       
+        for i in range(4):
+            if choose == i:
+                return choose
+                     
+#========================================================================
+# 1. 웹 크롤링 (현재 인기 키워드 추출) : BeautifulSoup
+JsonData = requests.get('https://www.naver.com/srchrank?frm=main').json()
+ranks = JsonData.get("data")
+
+keywordList = []
+
+for r in ranks:
+    # 각 데이터는 rank, keyword, keyword_synomyms
+    keywordList.append(r.get("keyword"))
+    
+#========================================================================
+# 1-2. 웹 크롤링 (인기 키워드 추출) : 구글 트렌드
+    
+    
+    
+#========================================================================
+# 2. 키워드 번역 + 키워드 트렌드 API (일정 기간 이상 언급된 인기 키워드 추천) : Naver Open API
+# 데이터 제한으로 인한 일시적인 주석 처리 필요  
+    
+resultData = pd.DataFrame(columns=['Date','Keyword', 'Mention'])
+   
+for keyword in keywordList:
+    translated = translate_keyword(keyword)
+    if translated :  
+        result = pd.DataFrame(data = trand_keyword(keyword,translated)).T
+        result['Date'] = datetime.today().strftime("%Y/%m/%d %H:%M")
+        resultData = pd.concat([resultData,result])
+    else :
+        print("번역 실패 : " + keyword)
+        
+# 올해 트렌트 키워드 재정렬
+SortData = resultData.sort_values(by=['Mention'] ,ascending=False)
+
+# ** SortedData = 인기 키워드 / 언급 기간 저장
+is_Sorted = SortData['Mention'] >= 1
+SortedData = SortData[is_Sorted]
+SortedData.index = range(len(SortedData))
+
+# 결과를 출력 (추후 주석처리)
+print("========================")
+print("현시각 추천 키워드")
+print("------------------------")
+for index, data in enumerate(SortedData['Keyword']) :
+    print(" " + str(index+1) + ". " + data)
+print("========================")
+
+#========================================================================
+# 3. 해당 키워드의 기사제목 감정분석
+# 긍정/부정 메모장 첨부 필요
+
+# 긍정/부정 표현 데이터 불러오기
+posneg = Set_Posneg()
+EmotionData = pd.DataFrame(columns=['News', 'News_ratio'])
+
+# 뉴스 기사 제목 감정 분석 (긍정/부정/중립 추출)
+for num, data in enumerate(SortedData['Keyword']) :
+    emo_data = pd.DataFrame(Get_NewsEmotionData(index+1, data), columns=[num]).T
+    EmotionData = pd.concat([EmotionData,emo_data])
+
+# ** SortedData = 소셜인식 / 인식 비율 저장
+SortedData = pd.concat([SortedData, EmotionData], axis=1, sort=False) 
+
+#========================================================================
+# 4. 소셜키워드에 대한 정보
+# 트위터에서 해당 키워드 검색하여, 내용 추출
+
+# 계정 승인
+auto = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auto.set_access_token(access_token, access_token_secret)
+twitter_api = tweepy.API(auto)
+
+ResultData = pd.DataFrame(columns=['Date', 'Keyword', 'Mention','News','News_ratio'])
+reviews = []
+reviews_type = []
+
+for num, data in enumerate(SortedData['Keyword']) :
+    #키워드 검색 및 결과
+    tweet = twitter_api.search(data)
+    for tw in tweet:
+        # 리트윗(중복) 미포함
+        if tw.text.find("RT") == -1:
+            # 트윗 데이터 따로 저장
+            reviews.append(tw.text) #텍스트 결과
+            reviews_type.append(Get_TwitterEmotionData(tw.text)) #텍스트 감정 분석
+            ResultData = ResultData.append(SortedData.loc[num])
+            
+ResultData = ResultData.reset_index(drop=True)
+reviews = pd.Series(reviews)
+ResultData['Review_type'] = reviews_type
+ResultData['Review'] = reviews
+
+#========================================================================
+# 5. 데이터프레임 -> 엑셀 파일로 저장
+
+# 이전 파일 불러와서, 최신 검색 정보 저장
+BeforeData = pd.read_excel('./HotKeyword_Data.xlsx')
+
+# 중복되는 키워드 내용 삭제 및 결합
+for key in ResultData['Keyword']:
+    BeforeData = BeforeData[BeforeData.Keyword != key]
+BeforeData = pd.concat([BeforeData, ResultData])      
+        
+BeforeData.to_excel('HotKeyword_Data.xlsx', index=False)
+
+#========================================================================
+# 웹드라이버 설치 및 경로 지정 필요
+
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+
+SiteList = ['네이버 데이터랩','데이터플래닛','빅데이터 전략센터']
+LinkList = ['https://datalab.naver.com/', 'https://www.dataplanet.co.kr/', 'http://search.kbig.kr/experience/home.do']
+
+# 결과를 출력 (추후 주석처리)
+#choose = Get_SiteNum()
+        
+# Chrome 웹 드라이버 생성
+#driver = webdriver.Chrome('C:/Users/W15 208/Desktop/chromedriver.exe')
+        
+# url 로딩
+#print(LinkList[choose])
+#driver.get(LinkList[choose])
+
+   
